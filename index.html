@@ -3,7 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>退休速算_Snap Retire by lanzul</title>
+    <title>Snap Retire 退休速算｜FIRE 退休計算機（蒙地卡羅模擬）</title>
+    <meta name="description" content="免費視覺化退休試算工具：輸入年齡、淨資產、開銷與儲蓄，用 1000 次蒙地卡羅模擬看你的退休資金「撐到預計壽命的機率」。適合 FIRE 與 Barista FIRE 規劃，免註冊。">
+    <link rel="canonical" href="https://lanzul.github.io/fire/">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="theme-color" content="#0b1020">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Snap Retire 退休速算">
+    <meta property="og:locale" content="zh_TW">
+    <meta property="og:title" content="Snap Retire 退休速算｜FIRE 退休計算機（蒙地卡羅模擬）">
+    <meta property="og:description" content="免費視覺化退休試算工具：輸入年齡、淨資產、開銷與儲蓄，用 1000 次蒙地卡羅模擬看你的退休資金「撐到預計壽命的機率」。適合 FIRE 與 Barista FIRE 規劃，免註冊。">
+    <meta property="og:url" content="https://lanzul.github.io/fire/">
+    <meta property="og:image" content="https://lanzul.github.io/fire/og-image.png">
+    <meta property="og:image:width" content="1419">
+    <meta property="og:image:height" content="849">
+    <meta property="og:image:alt" content="Snap Retire 財務圖表分析中心：1000 次蒙地卡羅模擬的淨資產走勢與成功率">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Snap Retire 退休速算｜FIRE 退休計算機（蒙地卡羅模擬）">
+    <meta name="twitter:description" content="免費視覺化退休試算工具：輸入年齡、淨資產、開銷與儲蓄，用 1000 次蒙地卡羅模擬看你的退休資金「撐到預計壽命的機率」。適合 FIRE 與 Barista FIRE 規劃，免註冊。">
+    <meta name="twitter:image" content="https://lanzul.github.io/fire/og-image.png">
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Snap Retire 退休速算", "alternateName": "FIRE 退休計算機", "url": "https://lanzul.github.io/fire/", "description": "免費視覺化退休試算工具：輸入年齡、淨資產、開銷與儲蓄，用 1000 次蒙地卡羅模擬看你的退休資金「撐到預計壽命的機率」。適合 FIRE 與 Barista FIRE 規劃，免註冊。", "inLanguage": "zh-TW", "applicationCategory": "FinanceApplication", "operatingSystem": "Any", "browserRequirements": "Requires JavaScript", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "TWD"}, "author": {"@type": "Person", "name": "lanzul"}, "image": "https://lanzul.github.io/fire/og-image.png"}</script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -173,6 +192,34 @@
 
     <div id="root" class="relative z-10"></div>
 
+    <section id="about" class="relative z-10 max-w-[1400px] mx-auto px-4 md:px-8 pt-2 pb-16 text-slate-300 text-sm leading-7 font-light">
+        <div class="glass-panel rounded-3xl p-6 md:p-8 mb-6 md:mb-8">
+            <h1 class="text-2xl md:text-3xl font-bold text-white mb-3">Snap Retire 退休速算：FIRE 退休計算機</h1>
+            <p>Snap Retire 是一款免費的視覺化退休試算工具。輸入目前年齡、預計退休年齡、淨資產、每月開銷與每年儲蓄，並設定預期報酬率、市場波動度與通膨率，就能用 <strong class="text-slate-100">1000 次蒙地卡羅模擬</strong>看到你的退休資金「撐到預計壽命的機率」。</p>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-stretch">
+            <div class="glass-panel rounded-3xl p-6 md:p-8">
+                <h2 class="text-lg font-semibold text-white mb-2">適合誰使用</h2>
+                <p>想知道「我幾歲可以退休」「要存多少錢才夠」的上班族，或正在評估 FIRE（財務獨立、提早退休）與 Barista FIRE 計畫的人。不需要註冊或登入。</p>
+                <h2 class="text-lg font-semibold text-white mb-2 mt-6">為什麼用蒙地卡羅，而不是平均報酬率？</h2>
+                <p>只用固定年報酬率試算，會忽略市場漲跌的順序。退休初期遇到大跌（序列風險）對資產壽命的影響，遠大於後期。蒙地卡羅模擬會產生上千種不同的市場路徑，讓你看到的是「機率」，而不是單一的樂觀數字。</p>
+                <h2 class="text-lg font-semibold text-white mb-2 mt-6">如何解讀結果</h2>
+                <ul class="list-disc pl-6 space-y-1">
+                    <li><strong class="text-slate-100">成功率：</strong>1000 次模擬中，資產沒有提前歸零的比例。</li>
+                    <li><strong class="text-slate-100">P50 中位數曲線：</strong>市場表現居中時的資產走勢。</li>
+                    <li><strong class="text-slate-100">實質購買力：</strong>圖表金額已扣除通膨，等同今天的幣值。</li>
+                </ul>
+                <p class="mt-3">成功率偏低時，可嘗試延後退休、提高儲蓄、降低退休後開銷，或加入退休後的兼職收入。</p>
+            </div>
+            <div class="glass-panel rounded-3xl p-6 md:p-8">
+                <h2 class="text-lg font-semibold text-white mb-2 mb-4">常見問題</h2>
+                <div class=""><h3 class="text-base font-semibold text-slate-100 mb-1">退休成功率是怎麼算出來的？</h3><p>依你設定的報酬率與波動度隨機模擬 1000 種市場路徑，成功率是資產撐到預計壽命的比例。</p></div><div class="mt-5"><h3 class="text-base font-semibold text-slate-100 mb-1">圖表上的金額是名目還是實質購買力？</h3><p>金額已依通膨率折算為今天的實質購買力。</p></div><div class="mt-5"><h3 class="text-base font-semibold text-slate-100 mb-1">我輸入的資料會被上傳嗎？</h3><p>不會。所有計算都在你自己的瀏覽器裡完成，你輸入的年齡、資產、開銷等數字不會被傳送到任何伺服器，也不會被儲存或寫入 Cookie，關閉或重新整理頁面後就會清除。不需註冊或登入。</p>
+                    <p class="mt-2">這個工具是<strong class="text-slate-100">單一 HTML 檔案，原始碼完全公開</strong>：在頁面上按右鍵選「檢視原始碼」（或按 Ctrl／Cmd + U），就能自行檢查程式有沒有送出資料。</p>
+                    <p class="mt-2 text-xs text-slate-400">補充說明：頁面會從公開的 CDN（cdnjs、jsdelivr、Tailwind）載入程式庫，並從 Google Fonts 載入字型，這些服務和 GitHub Pages 如同一般網站，可能記錄連線 IP 等基本訪客資訊，但看不到你輸入的內容。</p></div><div class="mt-5"><h3 class="text-base font-semibold text-slate-100 mb-1">這個結果可以當作投資建議嗎？</h3><p>不行。模擬結果取決於你輸入的假設，不代表未來實際報酬，僅供規劃參考。</p></div>
+            </div>
+        </div>
+    </section>
+
     <script type="text/babel" data-type="module">
         const { useState, useEffect, useMemo, useCallback, useRef, useDeferredValue } = React;
         const { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } = window.Recharts; 
@@ -238,6 +285,15 @@
             const [pensionMonthly, setPensionMonthly] = useState(0);
             const [pensionStartAge, setPensionStartAge] = useState(65);
             const [currency, setCurrency] = useState('NT$');
+            // 窄螢幕（手機）：Y 軸刻度不顯示貨幣符號，只在 0 旁標註，以節省寬度
+            const [isNarrow, setIsNarrow] = useState(() => window.matchMedia('(max-width: 767px)').matches);
+            useEffect(() => {
+                const mq = window.matchMedia('(max-width: 767px)');
+                const on = (e) => setIsNarrow(e.matches);
+                setIsNarrow(mq.matches);
+                if (mq.addEventListener) { mq.addEventListener('change', on); return () => mq.removeEventListener('change', on); }
+                mq.addListener(on); return () => mq.removeListener(on);
+            }, []);
 
             const [investmentReturn, setInvestmentReturn] = useState(7);
             const [inflationRate, setInflationRate] = useState(3);
@@ -352,14 +408,14 @@
             };
 
             const formatYAxis = (tickItem) => {
-                if (tickItem === 0) return currency + '0';
+                if (tickItem === 0) return isNarrow ? `0 (${currency})` : currency + '0';
                 const absVal = Math.abs(tickItem);
                 const sign = tickItem < 0 ? '-' : '';
                 if (absVal >= 100000000) {
                     const billionVal = absVal / 100000000;
-                    return `${sign}${currency}${parseFloat(billionVal.toFixed(1))}億`;
+                    return `${sign}${isNarrow ? '' : currency}${parseFloat(billionVal.toFixed(1))}億`;
                 }
-                return `${sign}${currency}${formatNumber(absVal / 10000)}萬`;
+                return `${sign}${isNarrow ? '' : currency}${formatNumber(absVal / 10000)}萬`;
             };
 
             const mulberry32 = (a) => {
@@ -649,6 +705,8 @@
                 totalExpense: chartData[chartData.length - 1].accExpense
             } : { totalLabor: 0, totalCapital: 0, totalExpense: 0 };
 
+            // Y 軸標籤最長約「符號 + 8 個字元」（如 NT$12,000萬），依符號長度預留寬度避免被裁切
+            const yAxisWidth = isNarrow ? Math.round(Math.max(currency.length + 4, 7) * 7.4 + 8) : Math.round((currency.length + 8) * 7.4 + 12);
             const errors = [];
             if (workStatus === 'working' && retireAge !== '' && currentAge !== '' && Number(retireAge) < Number(currentAge)) errors.push('退休年齡不能小於目前年齡。');
             if (lifeExpectancy !== '' && currentAge !== '' && Number(lifeExpectancy) <= Math.max(Number(currentAge), workStatus === 'working' ? Number(retireAge) || 0 : 0)) errors.push('預期壽命必須大於目前年齡與退休年齡。');
@@ -1147,7 +1205,7 @@
                                     )}
                                     {chartData.length > 0 ? (
                                         <ResponsiveContainer width="100%" height="100%">
-                                            <AreaChart data={chartData} margin={{ top: 35, right: 30, left: 20, bottom: 20 }}>
+                                            <AreaChart data={chartData} margin={{ top: 35, right: 30, left: 4, bottom: 20 }}>
                                                 <defs>
                                                     <linearGradient id="colorNetWorth" x1="0" y1="0" x2="0" y2="1">
                                                         <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.6}/>
@@ -1168,6 +1226,7 @@
                                                     label={{ value: '年齡', position: 'insideBottom', offset: -15, fill: '#64748b', fontSize: 12 }}
                                                 />
                                                 <YAxis 
+                                                    width={yAxisWidth}
                                                     tickCount={15}
                                                     tickFormatter={formatYAxis} 
                                                     tick={{ fill: '#94a3b8', fontSize: 12, fontFamily: 'monospace' }}
@@ -1337,7 +1396,7 @@
                                 <div className="h-[450px] w-full relative z-10">
                                     {chartData.length > 0 ? (
                                         <ResponsiveContainer width="100%" height="100%">
-                                            <LineChart data={chartData} margin={{ top: 35, right: 30, left: 20, bottom: 20 }}>
+                                            <LineChart data={chartData} margin={{ top: 35, right: 30, left: 4, bottom: 20 }}>
                                                 <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="rgba(255,255,255,0.15)" />
                                                 <XAxis 
                                                     dataKey="age" 
@@ -1348,6 +1407,7 @@
                                                     label={{ value: '年齡', position: 'insideBottom', offset: -15, fill: '#64748b', fontSize: 12 }}
                                                 />
                                                 <YAxis 
+                                                    width={yAxisWidth}
                                                     tickCount={15}
                                                     tickFormatter={formatYAxis} 
                                                     tick={{ fill: '#94a3b8', fontSize: 12, fontFamily: 'monospace' }}
