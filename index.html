@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>退休速算_Snap Retire by lanzul</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-is@18/umd/react-is.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/recharts@2.1.12/umd/Recharts.js"></script>
+    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        glass: {
+                            DEFAULT: 'rgba(255, 255, 255, 0.03)',
+                            border: 'rgba(255, 255, 255, 0.08)',
+                            highlight: 'rgba(255, 255, 255, 0.12)',
+                        },
+                        brand: {
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                        }
+                    },
+                    animation: {
+                        'blob': 'blob 20s infinite',
+                        'slide-down': 'slideDown 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(25px, -35px) scale(1.06)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.94)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        slideDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-16px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            background: linear-gradient(135deg, #090a0f 0%, #12141c 50%, #07090e 100%);
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .recharts-wrapper {
+            outline: none;
+        }
+
+        .glass-panel {
+            background: rgba(18, 24, 38, 0.45);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 10px 30px -10px rgba(0, 0, 0, 0.5),
+                0 30px 60px -15px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .glass-input {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(139, 92, 246, 0.6);
+            box-shadow: 
+                inset 0 2px 4px rgba(0,0,0,0.4),
+                0 0 0 3px rgba(139, 92, 246, 0.25);
+            outline: none;
+        }
+
+        .crystal-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            padding: 8px 0;
+        }
+        .crystal-slider:focus {
+            outline: none;
+        }
+        
+        .crystal-slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: rgba(2, 3, 6, 0.95);
+            border-radius: 999px;
+            border-top: 1px solid rgba(0, 0, 0, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 
+                inset 0 3px 6px rgba(0,0,0,0.95),
+                0 1px 4px rgba(167, 139, 250, 0.18);
+        }
+
+        .crystal-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 22px;
+            width: 16px;
+            margin-top: -8px;
+            cursor: pointer;
+            background: linear-gradient(180deg, #e2d9fc 0%, #a78bfa 40%, #7c3aed 100%);
+            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 3px;
+            box-shadow: 
+                0 3px 8px rgba(0,0,0,0.7), 
+                0 0 10px rgba(167, 139, 250, 0.6),
+                inset 0 1px 1px rgba(255,255,255,0.9);
+            clip-path: polygon(0 0, 100% 0, 100% 60%, 50% 100%, 0 60%);
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+        
+        .crystal-slider::-webkit-slider-thumb:hover {
+            background: linear-gradient(180deg, #f3e8ff 0%, #c4b5fd 40%, #8b5cf6 100%);
+            transform: scale(1.12);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased relative min-h-screen">
+    
+    <!-- 背景動態磨砂光暈球體 -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute top-[-10%] left-[-10%] w-[55vw] h-[55vw] rounded-full bg-purple-600/15 mix-blend-screen filter blur-[170px] opacity-50 animate-blob"></div>
+        <div class="absolute top-[25%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-indigo-600/15 mix-blend-screen filter blur-[170px] opacity-50 animate-blob" style="animation-delay: 7s"></div>
+        <div class="absolute bottom-[-25%] left-[10%] w-[75vw] h-[75vw] rounded-full bg-blue-600/35 mix-blend-screen filter blur-[150px] opacity-40 animate-blob" style="animation-duration: 20s; animation-delay: 3s;"></div>
+    </div>
+
+    <div id="root" class="relative z-10"></div>
+
+    <script type="text/babel" data-type="module">
+        const { useState, useEffect, useMemo, useCallback, useRef } = React;
+        const { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } = window.Recharts; 
+
+        // 破產紅點元件
+        const CustomReferenceDot = (props) => {
+            const { cx, cy, hitZeroAge } = props;
+            if (cx === undefined || cy === undefined || hitZeroAge === null) return null;
+
+            return (
+                <g style={{ zIndex: 9999 }}>
+                    <circle cx={cx} cy={cy} r={6} fill="#ef4444" stroke="#ffffff" strokeWidth={1.5} filter="drop-shadow(0px 0px 6px rgba(239,68,68,0.9))"/>
+                    <text x={cx} y={cy - 41} fill="#ef4444" fontSize={13} fontWeight="bold" textAnchor="middle" style={{textShadow: '0 2px 8px rgba(0,0,0,0.95), 0 0 4px rgba(0,0,0,0.9)'}}>
+                        <tspan x={cx} dy="0">{hitZeroAge} 歲</tspan>
+                        <tspan x={cx} dy="1.3em">時破產</tspan>
+                    </text>
+                </g>
+            );
+        };
+
+        // 財務自由黃點元件
+        const CustomFIReferenceDot = (props) => {
+            const { cx, cy, hitFIAge } = props;
+            if (cx === undefined || cy === undefined || hitFIAge === null) return null;
+
+            return (
+                <g style={{ zIndex: 9999 }}>
+                    <circle cx={cx} cy={cy} r={6} fill="#fbbf24" stroke="#ffffff" strokeWidth={1.5} filter="drop-shadow(0px 0px 6px rgba(251,191,36,0.9))"/>
+                    <text x={cx} y={cy - 41} fill="#fbbf24" fontSize={13} fontWeight="bold" textAnchor="middle" style={{textShadow: '0 2px 8px rgba(0,0,0,0.95), 0 0 4px rgba(0,0,0,0.9)'}}>
+                        <tspan x={cx} dy="0">財務自由</tspan>
+                        <tspan x={cx} dy="1.3em">({hitFIAge} 歲)</tspan>
+                    </text>
+                </g>
+            );
+        };
+
+        function RetirementCalculator() {
+            const [workStatus, setWorkStatus] = useState('working'); 
+            const [currentAge, setCurrentAge] = useState(30);
+            const [retireAge, setRetireAge] = useState(65);
+            const [lifeExpectancy, setLifeExpectancy] = useState(95);
+
+            const [netWorth, setNetWorth] = useState(3000000);
+            const [monthlyExpense, setMonthlyExpense] = useState(30000);
+            const [annualSavings, setAnnualSavings] = useState(300000);
+
+            const [investmentReturn, setInvestmentReturn] = useState(7);
+            const [inflationRate, setInflationRate] = useState(3);
+            
+            // 是否開啟隨機浮動 (對應 擬真浮動)
+            const [enableRandomFloat, setEnableRandomFloat] = useState(false);
+            const [randomSeed, setRandomSeed] = useState(Date.now());
+            // 報酬率模式：'p25', 'p50', 'p75'
+            const [returnMode, setReturnMode] = useState('p50');
+            // 波動度級距：'low' (5%), 'mid' (10%), 'high' (15%)
+            const [volatilityLevel, setVolatilityLevel] = useState('high');
+
+            const [currencyType, setCurrencyType] = useState('today');
+            const [activeTab, setActiveTab] = useState('netWorth');
+            const [incomeViewType, setIncomeViewType] = useState('annual');
+
+            const [netWorthStr, setNetWorthStr] = useState('3,000,000');
+            const [monthlyExpenseStr, setMonthlyExpenseStr] = useState('30,000');
+            const [annualSavingsStr, setAnnualSavingsStr] = useState('300,000');
+
+            const [keepGrowingExpense, setKeepGrowingExpense] = useState(false);
+            const [keepGrowingNetWorth, setKeepGrowingNetWorth] = useState(false);
+
+            const formatNumber = (num) => {
+                if (num === null || num === undefined || num === '') return '';
+                const isNegative = num < 0;
+                const absStr = Math.abs(Number(num)).toLocaleString('en-US');
+                return isNegative ? `-${absStr}` : absStr;
+            };
+
+            const formatCurrencyText = (num) => {
+                if (num === null || num === undefined) return '$0';
+                const isNeg = num < 0;
+                const absVal = Math.abs(num);
+                return `${isNeg ? '-$' : '$'}${formatNumber(absVal)}`;
+            };
+
+            // 自動平衡機制：當勾選「保持成長」時，動態計算並調整淨資產或每月開銷
+            useEffect(() => {
+                if (enableRandomFloat) return;
+
+                const baseRet = Number(investmentReturn);
+                const infRate = Number(inflationRate);
+                const realReturnRate = (1 + baseRet / 100) / (1 + infRate / 100) - 1;
+
+                if (realReturnRate <= 0) {
+                    if (keepGrowingNetWorth) setKeepGrowingNetWorth(false);
+                    if (keepGrowingExpense) setKeepGrowingExpense(false);
+                    return;
+                }
+
+                if (keepGrowingNetWorth) {
+                    const yearlyExpense = monthlyExpense * 12;
+                    const targetWRetire = (yearlyExpense * (1 + realReturnRate)) / realReturnRate;
+                    let requiredCurrentNW = targetWRetire;
+
+                    if (workStatus === 'working' && retireAge > currentAge) {
+                        const yearsToRetire = retireAge - currentAge;
+                        const annSav = Number(annualSavings);
+                        const r = realReturnRate;
+                        
+                        const fvSavings = annSav * (1 + r) * (Math.pow(1 + r, yearsToRetire) - 1) / r;
+                        requiredCurrentNW = (targetWRetire - fvSavings) / Math.pow(1 + r, yearsToRetire);
+                    }
+
+                    const targetNetWorth = Math.ceil(Math.max(0, requiredCurrentNW));
+                    
+                    if (netWorth !== targetNetWorth) {
+                        setNetWorth(targetNetWorth);
+                        setNetWorthStr(formatNumber(targetNetWorth));
+                    }
+                } else if (keepGrowingExpense) {
+                    let projectedWRetire = netWorth;
+                    const r = realReturnRate;
+                    
+                    if (workStatus === 'working' && retireAge > currentAge) {
+                        const yearsToRetire = retireAge - currentAge;
+                        const annSav = Number(annualSavings);
+                        
+                        const fvSavings = annSav * (1 + r) * (Math.pow(1 + r, yearsToRetire) - 1) / r;
+                        projectedWRetire = netWorth * Math.pow(1 + r, yearsToRetire) + fvSavings;
+                    }
+
+                    const targetYearlyExpense = (projectedWRetire * r) / (1 + r);
+                    const targetExpense = Math.floor(Math.max(0, targetYearlyExpense / 12));
+                    
+                    if (monthlyExpense !== targetExpense) {
+                        setMonthlyExpense(targetExpense);
+                        setMonthlyExpenseStr(formatNumber(targetExpense));
+                    }
+                }
+            }, [keepGrowingNetWorth, keepGrowingExpense, monthlyExpense, netWorth, investmentReturn, inflationRate, workStatus, annualSavings, currentAge, retireAge, enableRandomFloat]);
+
+            const handleNetWorthChange = (e) => {
+                setKeepGrowingNetWorth(false);
+                const rawValue = e.target.value.replace(/\D/g, '');
+                if (rawValue !== '') {
+                    const numValue = parseInt(rawValue, 10);
+                    setNetWorth(numValue);
+                    setNetWorthStr(formatNumber(numValue));
+                } else {
+                    setNetWorth('');
+                    setNetWorthStr('');
+                }
+            };
+
+            const handleMonthlyExpenseChange = (e) => {
+                setKeepGrowingExpense(false);
+                const rawValue = e.target.value.replace(/\D/g, '');
+                if (rawValue !== '') {
+                    const numValue = parseInt(rawValue, 10);
+                    setMonthlyExpense(numValue);
+                    setMonthlyExpenseStr(formatNumber(numValue));
+                } else {
+                    setMonthlyExpense('');
+                    setMonthlyExpenseStr('');
+                }
+            };
+
+            const handleAnnualSavingsChange = (e) => {
+                setKeepGrowingExpense(false);
+                setKeepGrowingNetWorth(false);
+                const rawValue = e.target.value.replace(/\D/g, '');
+                if (rawValue !== '') {
+                    const numValue = parseInt(rawValue, 10);
+                    setAnnualSavings(numValue);
+                    setAnnualSavingsStr(formatNumber(numValue));
+                } else {
+                    setAnnualSavings('');
+                    setAnnualSavingsStr('');
+                }
+            };
+
+            const formatYAxis = (tickItem) => {
+                if (tickItem === 0) return '$0';
+                const absVal = Math.abs(tickItem);
+                const sign = tickItem < 0 ? '-' : '';
+                if (absVal >= 100000000) {
+                    const billionVal = absVal / 100000000;
+                    return `${sign}$${parseFloat(billionVal.toFixed(1))}億`;
+                }
+                return `${sign}$${formatNumber(absVal / 10000)}萬`;
+            };
+
+            const mulberry32 = (a) => {
+                return function() {
+                    let t = a += 0x6D2B79F5;
+                    t = Math.imul(t ^ t >>> 15, t | 1);
+                    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+                    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+                }
+            };
+
+            const simulateChart = useCallback((testExpense, testNetWorth) => {
+                const nw = testNetWorth !== undefined ? testNetWorth : netWorth;
+                const exp = testExpense !== undefined ? testExpense : monthlyExpense;
+
+                if (currentAge === '' || lifeExpectancy === '' || nw === '' || exp === '' || investmentReturn === '' || inflationRate === '' || (workStatus === 'working' && annualSavings === '')) {
+                    return { data: [], hitZeroAge: null, hitFIAge: null, mcSuccessRate: null };
+                }
+
+                let data = [];
+                let currentWorth = Number(nw);
+                const baseRet = Number(investmentReturn);
+                const infRate = Number(inflationRate);
+                const mthExp = Number(exp);
+                const curAge = Number(currentAge);
+                const lifeExp = Number(lifeExpectancy);
+                const retAge = Number(retireAge);
+                const annSav = Number(annualSavings);
+
+                const yearlyExpense = mthExp * 12;
+                const startAge = curAge;
+                const endAge = lifeExp;
+                let hitZeroAge = null;
+                let hitFIAge = null;
+
+                let accLabor = 0;
+                let accCapital = 0;
+                let accExpense = 0;
+
+                let prevEffectiveRet = null;
+                let prevLabor = 0;
+                let prevCap = 0;
+                let prevExp = 0;
+                let prevWorthForDiff = Number(nw);
+
+                if (!enableRandomFloat) {
+                    for (let age = startAge; age <= endAge; age++) {
+                        const yearIdx = age - startAge;
+
+                        const roundedWorth = Math.max(0, Math.round(currentWorth));
+                        const netChange = age === startAge ? 0 : roundedWorth - prevWorthForDiff;
+
+                        data.push({ 
+                            age: age, 
+                            netWorth: roundedWorth,
+                            netChange: netChange,
+                            yearlyReturnRate: age === startAge ? null : prevEffectiveRet,
+                            laborIncome: age === startAge ? 0 : prevLabor,
+                            capitalIncome: age === startAge ? 0 : prevCap,
+                            expense: age === startAge ? 0 : prevExp,
+                            accLabor: accLabor,
+                            accCapital: accCapital,
+                            accExpense: accExpense
+                        });
+                        
+                        prevWorthForDiff = roundedWorth;
+
+                        if (hitZeroAge === null && roundedWorth <= 0 && age > startAge) {
+                            hitZeroAge = age;
+                        }
+                        if (hitFIAge === null && age > startAge && prevCap >= prevExp && roundedWorth > 0) {
+                            hitFIAge = age;
+                        }
+
+                        const realReturnRate = (1 + baseRet / 100) / (1 + infRate / 100) - 1;
+                        let currentExp = 0, currentLabor = 0, currentCap = 0;
+
+                        if (currencyType === 'today') {
+                            currentCap = currentWorth > 0 ? currentWorth * realReturnRate : 0;
+                            currentExp = yearlyExpense;
+                            if (workStatus === 'working' && age < retAge) {
+                                currentLabor = yearlyExpense + annSav;
+                                currentWorth = (currentWorth + annSav) * (1 + realReturnRate);
+                            } else {
+                                currentWorth = (currentWorth - yearlyExpense) * (1 + realReturnRate);
+                            }
+                        } else {
+                            const infMultiplier = Math.pow(1 + infRate / 100, yearIdx);
+                            currentExp = yearlyExpense * infMultiplier;
+                            currentCap = currentWorth > 0 ? currentWorth * (baseRet / 100) : 0;
+                            
+                            if (workStatus === 'working' && age < retAge) {
+                                currentLabor = (yearlyExpense + annSav) * infMultiplier;
+                                const futureSavings = annSav * infMultiplier;
+                                currentWorth = (currentWorth + futureSavings) * (1 + baseRet / 100);
+                            } else {
+                                const futureYearlyExpense = yearlyExpense * infMultiplier;
+                                currentWorth = (currentWorth - futureYearlyExpense) * (1 + baseRet / 100);
+                            }
+                        }
+
+                        accLabor += Math.round(currentLabor);
+                        accCapital += Math.round(currentCap);
+                        accExpense += Math.round(currentExp);
+                        
+                        prevEffectiveRet = Number(baseRet.toFixed(2));
+                        prevLabor = Math.round(currentLabor);
+                        prevCap = Math.round(currentCap);
+                        prevExp = Math.round(currentExp);
+                    }
+                    return { data, hitZeroAge, hitFIAge, mcSuccessRate: null };
+                }
+
+                // --- 蒙地卡羅引擎 ---
+                const prng = mulberry32(randomSeed);
+                const iterations = 1000;
+                let allSims = [];
+                let successCount = 0;
+                
+                const sigmaMap = { low: 5, mid: 10, high: 15 };
+                const sigma = sigmaMap[volatilityLevel] || 15;
+
+                for (let i = 0; i < iterations; i++) {
+                    let tempWorth = nw;
+                    let returns = [];
+                    let netWorths = [];
+                    let localHitZero = null;
+
+                    for (let age = startAge; age <= endAge; age++) {
+                        const yearIdx = age - startAge;
+                        let u = prng(), v = prng();
+                        if(u === 0) u = 0.0001; if(v === 0) v = 0.0001;
+                        let z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+                        let effectiveRet = baseRet + z * sigma;
+                        returns.push(effectiveRet);
+
+                        if (tempWorth <= 0) {
+                            if (localHitZero === null) localHitZero = age;
+                        }
+
+                        const realReturnRate = (1 + effectiveRet / 100) / (1 + infRate / 100) - 1;
+                        if (currencyType === 'today') {
+                            if (workStatus === 'working' && age < retAge) {
+                                tempWorth = (tempWorth + annSav) * (1 + realReturnRate);
+                            } else {
+                                tempWorth = (tempWorth - yearlyExpense) * (1 + realReturnRate);
+                            }
+                        } else {
+                            const infMultiplier = Math.pow(1 + infRate / 100, yearIdx);
+                            if (workStatus === 'working' && age < retAge) {
+                                const futureSavings = annSav * infMultiplier;
+                                tempWorth = (tempWorth + futureSavings) * (1 + effectiveRet / 100);
+                            } else {
+                                const futureYearlyExpense = yearlyExpense * infMultiplier;
+                                tempWorth = (tempWorth - futureYearlyExpense) * (1 + effectiveRet / 100);
+                            }
+                        }
+                        netWorths.push(tempWorth);
+                    }
+
+                    if (tempWorth > 0) successCount++;
+                    allSims.push({
+                        finalWorth: tempWorth,
+                        hitZeroAge: localHitZero,
+                        returns: returns,
+                        netWorths: netWorths
+                    });
+                }
+
+                allSims.sort((a, b) => {
+                    if (a.finalWorth <= 0 && b.finalWorth > 0) return -1;
+                    if (a.finalWorth > 0 && b.finalWorth <= 0) return 1;
+                    if (a.finalWorth <= 0 && b.finalWorth <= 0) return a.hitZeroAge - b.hitZeroAge;
+                    return a.finalWorth - b.finalWorth;
+                });
+
+                const computedMcRate = ((successCount / iterations) * 100).toFixed(1);
+
+                let selectedIndex = 500; 
+                if (returnMode === 'p25') selectedIndex = 250;
+                if (returnMode === 'p75') selectedIndex = 750;
+                const repSim = allSims[selectedIndex];
+
+                for (let age = startAge; age <= endAge; age++) {
+                    const yearIdx = age - startAge;
+                    const effectiveRet = repSim.returns[yearIdx];
+
+                    const roundedWorth = Math.max(0, Math.round(currentWorth));
+                    const netChange = age === startAge ? 0 : roundedWorth - prevWorthForDiff;
+
+                    data.push({ 
+                        age: age, 
+                        netWorth: roundedWorth,
+                        netChange: netChange,
+                        yearlyReturnRate: age === startAge ? null : prevEffectiveRet,
+                        laborIncome: age === startAge ? 0 : prevLabor,
+                        capitalIncome: age === startAge ? 0 : prevCap,
+                        expense: age === startAge ? 0 : prevExp,
+                        accLabor: accLabor,
+                        accCapital: accCapital,
+                        accExpense: accExpense
+                    });
+                    
+                    prevWorthForDiff = roundedWorth;
+
+                    let stepWorths = allSims.map(s => Math.max(0, s.netWorths[yearIdx]));
+                    stepWorths.sort((a,b) => a - b);
+                    data[data.length - 1].netWorthRange = [Math.round(stepWorths[250]), Math.round(stepWorths[750])];
+
+                    if (hitZeroAge === null && roundedWorth <= 0 && age > startAge) {
+                        hitZeroAge = age;
+                    }
+                    if (hitFIAge === null && age > startAge && prevCap >= prevExp && roundedWorth > 0) {
+                        hitFIAge = age;
+                    }
+
+                    const realReturnRate = (1 + effectiveRet / 100) / (1 + infRate / 100) - 1;
+                    let currentExp = 0, currentLabor = 0, currentCap = 0;
+
+                    if (currencyType === 'today') {
+                        currentCap = currentWorth > 0 ? currentWorth * realReturnRate : 0;
+                        currentExp = yearlyExpense;
+                        if (workStatus === 'working' && age < retAge) {
+                            currentLabor = yearlyExpense + annSav;
+                            currentWorth = (currentWorth + annSav) * (1 + realReturnRate);
+                        } else {
+                            currentWorth = (currentWorth - yearlyExpense) * (1 + realReturnRate);
+                        }
+                    } else {
+                        const infMultiplier = Math.pow(1 + infRate / 100, yearIdx);
+                        currentExp = yearlyExpense * infMultiplier;
+                        currentCap = currentWorth > 0 ? currentWorth * (effectiveRet / 100) : 0;
+                        
+                        if (workStatus === 'working' && age < retAge) {
+                            currentLabor = (yearlyExpense + annSav) * infMultiplier;
+                            const futureSavings = annSav * infMultiplier;
+                            currentWorth = (currentWorth + futureSavings) * (1 + effectiveRet / 100);
+                        } else {
+                            const futureYearlyExpense = yearlyExpense * infMultiplier;
+                            currentWorth = (currentWorth - futureYearlyExpense) * (1 + effectiveRet / 100);
+                        }
+                    }
+
+                    accLabor += Math.round(currentLabor);
+                    accCapital += Math.round(currentCap);
+                    accExpense += Math.round(currentExp);
+                    
+                    prevEffectiveRet = Number(effectiveRet.toFixed(2));
+                    prevLabor = Math.round(currentLabor);
+                    prevCap = Math.round(currentCap);
+                    prevExp = Math.round(currentExp);
+                }
+
+                return { data, hitZeroAge: repSim.hitZeroAge, hitFIAge, mcSuccessRate: computedMcRate };
+
+            }, [currentAge, lifeExpectancy, netWorth, monthlyExpense, investmentReturn, inflationRate, workStatus, annualSavings, retireAge, currencyType, enableRandomFloat, returnMode, volatilityLevel, randomSeed]);
+
+            const chartDataObj = useMemo(() => {
+                return simulateChart();
+            }, [simulateChart]);
+
+            const chartData = chartDataObj.data;
+            const hitZeroAge = chartDataObj.hitZeroAge;
+            const hitFIAge = chartDataObj.hitFIAge;
+            const mcSuccessRate = chartDataObj.mcSuccessRate;
+
+            const isDecliningAfterRetire = useMemo(() => {
+                if (chartData.length < 2) return false;
+                const startRetireAge = workStatus === 'working' ? Number(retireAge) : Number(currentAge);
+                const retireData = chartData.find(d => d.age === startRetireAge);
+                const finalData = chartData[chartData.length - 1];
+                
+                if (retireData && finalData) {
+                    return finalData.netWorth < retireData.netWorth || hitZeroAge !== null;
+                }
+                return false;
+            }, [chartData, workStatus, retireAge, currentAge, hitZeroAge]);
+
+            const showKeepGrowing = !enableRandomFloat && (isDecliningAfterRetire || keepGrowingNetWorth || keepGrowingExpense);
+            
+            const lifetimeSummary = chartData.length > 0 ? {
+                totalLabor: chartData[chartData.length - 1].accLabor,
+                totalCapital: chartData[chartData.length - 1].accCapital,
+                totalExpense: chartData[chartData.length - 1].accExpense
+            } : { totalLabor: 0, totalCapital: 0, totalExpense: 0 };
+
+            return (
+                <div className="max-w-[1400px] mx-auto p-4 md:p-8 w-full flex flex-col gap-6 md:gap-8 z-10 relative">
+                    <div className="glass-panel rounded-3xl p-6 md:p-8 flex flex-col md:flex-row gap-8 md:gap-10 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-[0.02] rounded-full blur-3xl pointer-events-none transform translate-x-1/2 -translate-y-1/2"></div>
+                        
+                        {/* 第一欄：關於你 */}
+                        <div className="flex-1 relative z-10">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-brand-500/30 border border-white/20">1</div>
+                                <h2 className="text-xl font-semibold text-white tracking-wide">關於你</h2>
+                            </div>
+                            
+                            <div className="space-y-8">
+                                <div>
+                                    <label className="block text-sm font-medium mb-3 text-slate-300">你目前的狀態</label>
+                                    <div className="flex bg-black/40 p-1.5 rounded-xl border border-white/10 shadow-inner">
+                                        <button 
+                                            className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 ${workStatus === 'working' ? 'bg-gradient-to-r from-brand-500 to-brand-600 shadow-[0_0_15px_rgba(139,92,246,0.4)] border border-white/20 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
+                                            onClick={() => { setWorkStatus('working'); setKeepGrowingExpense(false); setKeepGrowingNetWorth(false); }}
+                                        >
+                                            還在工作
+                                        </button>
+                                        <button 
+                                            className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 ${workStatus === 'retired' ? 'bg-gradient-to-r from-brand-500 to-brand-600 shadow-[0_0_15px_rgba(139,92,246,0.4)] border border-white/20 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
+                                            onClick={() => { setWorkStatus('retired'); setKeepGrowingExpense(false); setKeepGrowingNetWorth(false); }}
+                                        >
+                                            已經退休
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div className="flex justify-between items-center mb-3">
+                                        <label className="text-sm font-medium text-slate-300">你現在幾歲？</label>
+                                        <div className="flex items-center gap-2">
+                                            <input 
+                                                type="text"
+                                                inputMode="numeric"
+                                                value={currentAge}
+                                                onChange={(e) => { setCurrentAge(e.target.value.replace(/\D/g, '') === '' ? '' : Number(e.target.value.replace(/\D/g, ''))); setKeepGrowingExpense(false); setKeepGrowingNetWorth(false); }}
+                                                className="w-16 p-1.5 text-right glass-input rounded-lg font-medium text-white focus:outline-none"
+                                            />
+                                            <span className="text-sm text-slate-400">歲</span>
+                                        </div>
+                                    </div>
+                                    <input 
+                                        type="range" 
+                                        min="20" max="100" 
+                                        value={currentAge || 20} 
+                                        onChange={(e) => { setCurrentAge(Number(e.target.value)); setKeepGrowingExpense(false); setKeepGrowingNetWorth(false); }}
+                                        className="crystal-slider"
+                                    />
+                                </div>
+
+                                {workStatus === 'working' && (
+                                    <div className="animate-fade-in-up">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <label className="text-sm font-medium text-slate-300">你預計幾歲退休？</label>
+                                            <div className="flex items-center gap-2">
+                                                <input 
+                                                    type="text" 
+                                                    inputMode="numeric"
+                                                    value={retireAge}
+                                                    onChange={(e) => { setRetireAge(e.target.value.replace(/\D/g, '') === '' ? '' : Number(e.target.value.replace(/\D/g, ''))); setKeepGrowingExpense(false); setKeepGrowingNetWorth(false); }}
+                                                    className="w-16 p-1.5 text-right glass-input rounded-lg font-medium text-white focus:outline-none"
+                                                />
+                                                <span className="text-sm text-slate-400">歲</span>
+                                            </div>
+                                        </div>
+                                        <input 
+                                            type="range" 
+                                            min={currentAge || 20} max={lifeExpectancy || 100} 
+                                            value={retireAge || (currentAge || 20)} 
+                                            onChange={(e) => { setRetireAge(Number(e.target.value)); setKeepGrowingExpense(false); setKeepGrowingNetWorth(false); }}
+                                            className="crystal-slider"
+                                        />
+                                    </div>
+                                )}
+
+                                <div>
+                                    <div className="flex justify-between items-center mb-3">
+                                        <label className="text-sm font-medium text-slate-300 flex items-center gap-1.5">
+                                            你預計活到幾歲？ 
+                                            <span className="w-4 h-4 rounded-full bg-white/10 border border-white/20 text-slate-300 inline-flex items-center justify-center text-xs cursor-help" title="Life expectancy">i</span>
+                                        </label>
+                                        <div className="flex items-center gap-2">
+                                            <input 
+                                                type="text" 
+                                                inputMode="numeric"
+                                                value={lifeExpectancy}
+                                                onChange={(e) => { setLifeExpectancy(e.target.value.replace(/\D/g, '') === '' ? '' : Number(e.target.value.replace(/\D/g, ''))); setKeepGrowingExpense(false); setKeepGrowingNetWorth(false); }}
+                                                className="w-16 p-1.5 text-right glass-input rounded-lg font-medium text-white focus:outline-none"
+                                            />
+                                            <span className="text-sm text-slate-400">歲</span>
+                                        </div>
+                                    </div>
+                                    <input 
+                                        type="range" 
+                                        min={currentAge || 20} max="120" 
+                                        value={lifeExpectancy || (currentAge || 20)} 
+                                        onChange={(e) => { setLifeExpectancy(Number(e.target.value)); setKeepGrowingExpense(false); setKeepGrowingNetWorth(false); }}
+                                        className="crystal-slider"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="hidden md:block w-px bg-gradient-to-b from-transparent via-white/10 to-transparent"></div>
+                        <div className="md:hidden h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent my-2"></div>
+
+                        {/* 第二欄：資產與收支 */}
+                        <div className="flex-1 relative z-10">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-brand-500/30 border border-white/20">2</div>
+                                <h2 className="text-xl font-semibold text-white tracking-wide">資產與收支</h2>
+                            </div>
+
+                            <div className="space-y-8">
+                                <div>
+                                    <div className="flex justify-between items-center mb-1 min-h-[32px]">
+                                        <label className="text-sm font-medium text-slate-300">你的淨資產</label>
+                                        <div className={`transition-all duration-300 ease-out transform ${showKeepGrowing ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-1 pointer-events-none'}`}>
+                                            <label className="flex items-center gap-2 text-xs text-brand-400 cursor-pointer select-none bg-brand-900/30 px-3 py-1.5 rounded-full border border-brand-500/30 hover:bg-brand-900/50 transition-colors">
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={keepGrowingNetWorth}
+                                                    onChange={(e) => {
+                                                        const isChecked = e.target.checked;
+                                                        setKeepGrowingNetWorth(isChecked);
+                                                        if (isChecked) { setKeepGrowingExpense(false); }
+                                                    }}
+                                                    className="accent-brand-500 w-3.5 h-3.5 cursor-pointer"
+                                                />
+                                                <span className="font-medium tracking-wide">保持成長</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-slate-400/80 mb-3 font-light">包含投資帳戶、加密貨幣、現金、債券、房產淨值。</p>
+                                    <div className="relative group">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium group-focus-within:text-brand-400 transition-colors">$</span>
+                                        <input 
+                                            type="text" 
+                                            inputMode="numeric"
+                                            value={netWorthStr}
+                                            onChange={handleNetWorthChange}
+                                            className="w-full pl-8 pr-4 py-3.5 glass-input rounded-xl text-lg font-medium text-white transition-all"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div className="flex justify-between items-center mb-1 min-h-[32px]">
+                                        <label className="text-sm font-medium text-slate-300">每個月開銷多少？</label>
+                                        <div className={`transition-all duration-300 ease-out transform ${showKeepGrowing ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-1 pointer-events-none'}`}>
+                                            <label className="flex items-center gap-2 text-xs text-brand-400 cursor-pointer select-none bg-brand-900/30 px-3 py-1.5 rounded-full border border-brand-500/30 hover:bg-brand-900/50 transition-colors">
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={keepGrowingExpense}
+                                                    onChange={(e) => {
+                                                        const isChecked = e.target.checked;
+                                                        setKeepGrowingExpense(isChecked);
+                                                        if (isChecked) { setKeepGrowingNetWorth(false); }
+                                                    }}
+                                                    className="accent-brand-500 w-3.5 h-3.5 cursor-pointer"
+                                                />
+                                                <span className="font-medium tracking-wide">保持成長</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-slate-400/80 mb-3 font-light">我們假設退休後維持同樣的生活水準。</p>
+                                    <div className="relative group mb-5">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium group-focus-within:text-brand-400 transition-colors">$</span>
+                                        <input 
+                                            type="text" 
+                                            inputMode="numeric"
+                                            value={monthlyExpenseStr}
+                                            onChange={handleMonthlyExpenseChange}
+                                            className="w-full pl-8 pr-14 py-3.5 glass-input rounded-xl text-lg font-medium text-white transition-all"
+                                        />
+                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm border-l border-white/10 pl-3">/ 月</span>
+                                    </div>
+                                    <input 
+                                        type="range" 
+                                        min="0" max="300000" step="1000"
+                                        value={monthlyExpense || 0} 
+                                        onChange={(e) => {
+                                            setKeepGrowingExpense(false);
+                                            const val = Number(e.target.value);
+                                            setMonthlyExpense(val);
+                                            setMonthlyExpenseStr(formatNumber(val));
+                                        }}
+                                        className="crystal-slider"
+                                    />
+                                </div>
+
+                                {workStatus === 'working' && (
+                                    <div className="animate-fade-in-up">
+                                        <label className="block text-sm font-medium mb-1 text-slate-300">
+                                            每年可儲蓄金額
+                                            {annualSavings !== '' && monthlyExpense !== '' && (Number(annualSavings) + Number(monthlyExpense) * 12) > 0 && (
+                                                <span className="text-brand-400 font-semibold ml-2 text-xs tracking-wide">
+                                                    (儲蓄率：{((Number(annualSavings) / (Number(annualSavings) + Number(monthlyExpense) * 12)) * 100).toFixed(1)}%)
+                                                </span>
+                                            )}
+                                        </label>
+                                        <p className="text-xs text-slate-400/80 mb-3 font-light">這筆錢將在退休前持續投入資產中。</p>
+                                        <div className="relative group">
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium group-focus-within:text-brand-400 transition-colors">$</span>
+                                            <input 
+                                                type="text" 
+                                                inputMode="numeric"
+                                                value={annualSavingsStr}
+                                                onChange={handleAnnualSavingsChange}
+                                                className="w-full pl-8 pr-14 py-3.5 glass-input rounded-xl text-lg font-medium text-white transition-all"
+                                            />
+                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm border-l border-white/10 pl-3">/ 年</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="hidden md:block w-px bg-gradient-to-b from-transparent via-white/10 to-transparent"></div>
+                        <div className="md:hidden h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent my-2"></div>
+
+                        {/* 第三欄：進階假設 */}
+                        <div className="flex-1 relative z-10">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-brand-500/30 border border-white/20">3</div>
+                                <h2 className="text-xl font-semibold text-white tracking-wide">預計投資報酬率</h2>
+                            </div>
+
+                            <div className="space-y-8">
+                                <div>
+                                    <div className="flex justify-between items-center mb-3">
+                                        <div className="flex items-center gap-2">
+                                            {/* 參考圖片風格：固定報酬與擬真浮動 切換按鈕 */}
+                                            <div className="flex bg-black/40 p-1 rounded-lg border border-white/10 shadow-inner">
+                                                <button 
+                                                    className={`px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-all duration-300 ${!enableRandomFloat ? 'bg-gradient-to-r from-brand-500 to-brand-600 shadow-[0_0_10px_rgba(139,92,246,0.4)] border border-white/20 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
+                                                    onClick={() => setEnableRandomFloat(false)}
+                                                >
+                                                    固定報酬
+                                                </button>
+                                                <button 
+                                                    className={`px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-all duration-300 ${enableRandomFloat ? 'bg-gradient-to-r from-brand-500 to-brand-600 shadow-[0_0_10px_rgba(139,92,246,0.4)] border border-white/20 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
+                                                    onClick={() => {
+                                                        if (!enableRandomFloat) {
+                                                            setEnableRandomFloat(true);
+                                                            setRandomSeed(Date.now()); // 重換種子跑新亂數
+                                                            setKeepGrowingExpense(false);
+                                                            setKeepGrowingNetWorth(false);
+                                                        }
+                                                    }}
+                                                >
+                                                    擬真浮動
+                                                </button>
+                                            </div>
+                                            <span 
+                                                className="w-6 h-6 rounded-md bg-white/5 border border-white/10 text-slate-400 hover:text-slate-200 hover:bg-white/10 flex items-center justify-center text-xs cursor-help transition-colors relative group/tooltip font-serif italic" 
+                                            >
+                                                i
+                                                <div className="absolute top-full left-0 sm:left-auto sm:right-[-8px] mt-2 w-72 sm:w-80 max-w-[85vw] p-3.5 bg-slate-800/95 border border-slate-600 rounded-xl text-[11px] text-slate-200 leading-relaxed shadow-2xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 whitespace-normal backdrop-blur-md">
+                                                    <p className="mb-2"><strong>蒙地卡羅擬真流動率：</strong>「真金白銀」投入市場持續數十年，不是穩賺不賠，而是會經歷真實世界的經濟週期：有時遇到全球股災（暴跌 20%-30%），有時又迎來大爆發的超級多頭（暴賺 30%-40%）。因為未來的經濟順序沒人說得準，我們直接用電腦模擬 1,000 種不同的市場劇情線，並以三種狀態排列模擬。</p>
+                                                    <p className="text-brand-300"><strong>實務建議：</strong>在做長期退休財務規劃時，蒙地卡羅 P50 的結果更具真實參考價值，因為它去除了少數極端大漲路徑拉高平均值的偏差，呈現的是一般投資人在承受市場波動時，最機率中庸且客觀的資產累積軌跡。</p>
+                                                    {/* Tooltip 頂部小箭頭 */}
+                                                    <div className="absolute bottom-full left-4 sm:left-auto sm:right-2.5 border-4 border-transparent border-b-slate-800"></div>
+                                                </div>
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <input 
+                                                type="text"
+                                                inputMode="numeric"
+                                                value={investmentReturn}
+                                                onChange={(e) => setInvestmentReturn(e.target.value.replace(/\D/g, '') === '' ? '' : Number(e.target.value.replace(/\D/g, '')))}
+                                                className="w-16 p-1.5 text-right glass-input rounded-lg font-bold text-white focus:outline-none"
+                                            />
+                                            <span className="text-sm text-slate-400">%/年</span>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* 投資報酬率模式與波動度選單 */}
+                                    {enableRandomFloat && (
+                                        <div className="mb-4 flex gap-2 animate-slide-down">
+                                            <div className="w-[40%]">
+                                                <select 
+                                                    value={returnMode}
+                                                    onChange={(e) => setReturnMode(e.target.value)}
+                                                    className="w-full p-2.5 glass-input rounded-xl text-sm font-medium text-white focus:outline-none cursor-pointer"
+                                                >
+                                                    <option value="p25" className="bg-slate-900 text-white">逆風局 P25</option>
+                                                    <option value="p50" className="bg-slate-900 text-white">常態局 P50</option>
+                                                    <option value="p75" className="bg-slate-900 text-white">順風局 P75</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="w-[60%]">
+                                                <select 
+                                                    value={volatilityLevel}
+                                                    onChange={(e) => setVolatilityLevel(e.target.value)}
+                                                    className="w-full p-2.5 glass-input rounded-xl text-sm font-medium text-white focus:outline-none cursor-pointer border-brand-500/40"
+                                                >
+                                                    <option value="low" className="bg-slate-900 text-white">低波動 (3%~7%)</option>
+                                                    <option value="mid" className="bg-slate-900 text-white">中低波動 (8%~12%)</option>
+                                                    <option value="high" className="bg-slate-900 text-white">中高波動 (13%~17%)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* 波動度詳細說明框 */}
+                                    {enableRandomFloat && (
+                                        <div className="mb-4 p-3.5 rounded-xl bg-brand-950/40 border border-brand-500/30 text-xs text-brand-200/90 leading-relaxed backdrop-blur-sm space-y-2 animate-slide-down">
+                                            <div className="pt-1 text-[11px] text-brand-300/90 leading-normal">
+                                                {volatilityLevel === 'low' && (
+                                                    <>
+                                                        <p className="font-semibold mb-0.5">• 級距設定：低波動 (極保守 3% ~ 7%)</p>
+                                                        <p>• 標的範例：全球投資級公債、高評級公司債、美元定存/高利儲蓄。</p>
+                                                        <p>• 代表狀況：極度平穩。市場大跌它幾乎不動，大牛市時也賺不到錢。</p>
+                                                        <p>• 模擬特徵：P25 與 P75 靠得非常近，幾乎是一條直線，難以對抗長期通膨。</p>
+                                                    </>
+                                                )}
+                                                {volatilityLevel === 'mid' && (
+                                                    <>
+                                                        <p className="font-semibold mb-0.5">• 級距設定：中低波動 (穩健防禦 8% ~ 12%)</p>
+                                                        <p>• 標的範例：股債平衡型 (40%股+60%債)、全球全市場 ETF + 債券。</p>
+                                                        <p>• 代表狀況：標準防守配置。能參與市場部分增長，且具備較強下檔保護。</p>
+                                                        <p>• 模擬特徵：P25 防守線較高，悲觀情境下不容易潰散，適合退休準備期。</p>
+                                                    </>
+                                                )}
+                                                {volatilityLevel === 'high' && (
+                                                    <>
+                                                        <p className="font-semibold mb-0.5">• 級距設定：中高波動 (積極成長 13% ~ 17%)</p>
+                                                        <p>• 標的範例：高比例股票型 (80%股+20%債)、全球股票大盤 (VT)、台股大盤 (0050)。</p>
+                                                        <p>• 代表狀況：主流資產累積配置。一路上會經歷多次大風大浪，但長期擊敗通膨。</p>
+                                                        <p>• 模擬特徵：P75 爆發力極強，但 P25 需要靠你「長期持續投入」的紀律來防禦。</p>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <input 
+                                        type="range" 
+                                        min="-10" max="20" step="0.1"
+                                        value={investmentReturn || 0} 
+                                        onChange={(e) => setInvestmentReturn(Number(e.target.value))}
+                                        className="crystal-slider"
+                                    />
+                                </div>
+
+                                <div>
+                                    <div className="flex justify-between items-center mb-5">
+                                        <label className="text-sm font-medium text-slate-300 flex items-center gap-1.5">
+                                            通貨膨脹率 
+                                            <span className="w-4 h-4 rounded-full bg-white/10 border border-white/20 text-slate-300 inline-flex items-center justify-center text-xs cursor-help" title="Expected annual inflation rate">i</span>
+                                        </label>
+                                        <div className="flex items-center gap-2">
+                                            <input 
+                                                type="text"
+                                                inputMode="numeric"
+                                                value={inflationRate}
+                                                onChange={(e) => setInflationRate(e.target.value.replace(/\D/g, '') === '' ? '' : Number(e.target.value.replace(/\D/g, '')))}
+                                                className="w-16 p-1.5 text-right glass-input rounded-lg font-bold text-white focus:outline-none"
+                                            />
+                                            <span className="text-sm text-slate-400">%/年</span>
+                                        </div>
+                                    </div>
+                                    <input 
+                                        type="range" 
+                                        min="0" max="10" step="0.1"
+                                        value={inflationRate || 0} 
+                                        onChange={(e) => setInflationRate(Number(e.target.value))}
+                                        className="crystal-slider"
+                                    />
+                                </div>
+
+                                <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm shadow-inner">
+                                    <p className="text-xs text-slate-400/95 leading-relaxed font-light">
+                                        所有預估都以<strong className="text-brand-300 font-medium">今天的幣值</strong>呈現，所以圖表中顯示的數字反映的是你的錢未來<strong className="text-white">實際買得到的東西</strong>。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 整合版面：財務圖表分析中心 */}
+                    <div className="glass-panel rounded-3xl p-6 md:p-8 relative overflow-hidden">
+                        
+                        {/* 頂部切換 Tab 與說明 */}
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 relative z-10">
+                            <div>
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center text-sm shadow-lg shadow-brand-500/30 border border-white/20">⚙️</div>
+                                    <h2 className="text-xl font-bold text-white tracking-wide">財務圖表分析中心</h2>
+                                </div>
+                                <p className="text-sm text-slate-400 font-light">
+                                    {activeTab === 'netWorth' ? '觀察你的淨資產隨時間的成長與破產風險。' : '觀察勞動收入、資本所得與日常開銷的動態平衡與生涯累積。'}
+                                </p>
+                            </div>
+                            
+                            <div className="flex bg-black/40 p-1.5 rounded-xl border border-white/10 shadow-inner w-full md:w-auto">
+                                <button 
+                                    className={`flex-1 md:flex-none px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 ${activeTab === 'netWorth' ? 'bg-gradient-to-r from-brand-500 to-brand-600 shadow-[0_0_15px_rgba(139,92,246,0.4)] border border-white/20 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
+                                    onClick={() => setActiveTab('netWorth')}
+                                >
+                                    你的淨值變化
+                                </button>
+                                <button 
+                                    className={`flex-1 md:flex-none px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 ${activeTab === 'incomeExpense' ? 'bg-gradient-to-r from-brand-500 to-brand-600 shadow-[0_0_15px_rgba(139,92,246,0.4)] border border-white/20 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
+                                    onClick={() => setActiveTab('incomeExpense')}
+                                >
+                                    所得與支出分布
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* 內容區塊 1：淨值隨時間變化 */}
+                        {activeTab === 'netWorth' && (
+                            <div className="animate-fade-in">
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+                                    <div className="flex items-center gap-2 bg-black/20 px-3 py-1.5 rounded-full border border-white/10">
+                                        <span className="w-3 h-3 rounded-full bg-brand-400 shadow-[0_0_8px_rgba(167,139,250,0.8)]"></span>
+                                        <span className="text-sm font-medium text-slate-300">資產淨值軌跡</span>
+                                    </div>
+                                    
+                                    <div className="flex bg-black/40 rounded-lg border border-white/10 p-1 shadow-inner">
+                                        <button 
+                                            className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all ${currencyType === 'today' ? 'bg-white/10 text-white shadow-sm border border-white/10' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
+                                            onClick={() => setCurrencyType('today')}
+                                        >
+                                            今天幣值
+                                        </button>
+                                        <button 
+                                            className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all ${currencyType === 'future' ? 'bg-white/10 text-white shadow-sm border border-white/10' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
+                                            onClick={() => setCurrencyType('future')}
+                                        >
+                                            未來幣值
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="h-[450px] w-full relative z-10">
+                                    {enableRandomFloat && mcSuccessRate !== null && (
+                                        <div className="absolute top-[26px] left-20 md:left-24 z-20 pointer-events-none flex flex-col items-start opacity-90 animate-fade-in-up w-[130px] sm:w-[145px]">
+                                            <span className="w-full text-slate-300/90 font-normal text-[9px] md:text-[10px] mb-0.5 block" style={{textAlignLast: 'justify', textShadow: '0 2px 10px rgba(0,0,0,0.9)'}}>蒙地卡羅演算法 1000 次模擬</span>
+                                            <span className="w-full text-white font-bold text-xs md:text-sm mb-0.5 block" style={{textAlignLast: 'justify', textShadow: '0 2px 10px rgba(0,0,0,0.9)'}}>財務安全成功率</span>
+                                            <div className="w-full flex justify-between items-baseline" style={{textShadow: '0 4px 20px rgba(0,0,0,0.8)'}}>
+                                                <span className={`text-4xl md:text-5xl font-black ${Number(mcSuccessRate) >= 80 ? 'text-emerald-400' : Number(mcSuccessRate) >= 50 ? 'text-amber-400' : 'text-rose-500'}`}>
+                                                    {mcSuccessRate}
+                                                </span>
+                                                <span className={`text-2xl md:text-3xl font-bold ${Number(mcSuccessRate) >= 80 ? 'text-emerald-400' : Number(mcSuccessRate) >= 50 ? 'text-amber-400' : 'text-rose-500'}`}>
+                                                    %
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {chartData.length > 0 ? (
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart data={chartData} margin={{ top: 35, right: 30, left: 20, bottom: 20 }}>
+                                                <defs>
+                                                    <linearGradient id="colorNetWorth" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.6}/>
+                                                        <stop offset="95%" stopColor="#7c3aed" stopOpacity={0.05}/>
+                                                    </linearGradient>
+                                                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                                        <feGaussianBlur stdDeviation="4" result="blur" />
+                                                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                                    </filter>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="rgba(255,255,255,0.15)" />
+                                                <XAxis 
+                                                    dataKey="age" 
+                                                    tick={{ fill: '#94a3b8', fontSize: 12 }}
+                                                    tickLine={false}
+                                                    axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                                                    dy={10}
+                                                    label={{ value: '年齡', position: 'insideBottom', offset: -15, fill: '#64748b', fontSize: 12 }}
+                                                />
+                                                <YAxis 
+                                                    tickCount={15}
+                                                    tickFormatter={formatYAxis} 
+                                                    tick={{ fill: '#94a3b8', fontSize: 12, fontFamily: 'monospace' }}
+                                                    tickLine={false}
+                                                    axisLine={false}
+                                                    dx={-10}
+                                                />
+                                                <Tooltip 
+                                                    content={({ active, payload, label }) => {
+                                                        if (active && payload && payload.length) {
+                                                            const dataItem = payload[0].payload;
+                                                            return (
+                                                                <div style={{
+                                                                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                                                    backdropFilter: 'blur(12px)',
+                                                                    borderColor: 'rgba(255,255,255,0.1)',
+                                                                    borderRadius: '12px',
+                                                                    color: '#f8fafc',
+                                                                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1)',
+                                                                    border: '1px solid rgba(255,255,255,0.1)',
+                                                                    padding: '10px 14px'
+                                                                }}>
+                                                                    <div className="font-bold text-slate-200 border-b border-white/10 pb-1 mb-2 text-xs">
+                                                                        {label} 歲
+                                                                    </div>
+                                                                    <div className="space-y-1.5 text-xs">
+                                                                        <div className="flex justify-between items-center gap-4">
+                                                                            <span className="text-slate-400">資產淨值:</span>
+                                                                            <span className="font-bold text-purple-300">{formatCurrencyText(dataItem.netWorth)}</span>
+                                                                        </div>
+                                                                        {dataItem.age > currentAge && (
+                                                                            <div className="flex justify-between items-center gap-4">
+                                                                                <span className="text-slate-400">與去年差額:</span>
+                                                                                <span className={`font-semibold ${dataItem.netChange >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                                                                    {dataItem.netChange > 0 ? '+' : ''}{formatCurrencyText(dataItem.netChange)}
+                                                                                </span>
+                                                                            </div>
+                                                                        )}
+                                                                        {enableRandomFloat && dataItem.yearlyReturnRate !== null && (
+                                                                            <div className="flex justify-between items-center gap-4 pt-1 border-t border-white/5 mt-1">
+                                                                                <span className="text-slate-400">當年度流動報酬率:</span>
+                                                                                <span className={`font-semibold ${dataItem.yearlyReturnRate >= 0 ? 'text-blue-400' : 'text-rose-400'}`}>
+                                                                                    {dataItem.yearlyReturnRate > 0 ? '+' : ''}{dataItem.yearlyReturnRate}%
+                                                                                </span>
+                                                                            </div>
+                                                                        )}
+                                                                        {enableRandomFloat && dataItem.netWorthRange && (
+                                                                            <div className="flex justify-between items-center gap-4 pt-1 border-t border-white/5 mt-1">
+                                                                                <span className="text-slate-400">扇形 P25~P75 預期區間:</span>
+                                                                                <span className="font-semibold text-purple-300/70">
+                                                                                    {formatCurrencyText(dataItem.netWorthRange[0])} ~ {formatCurrencyText(dataItem.netWorthRange[1])}
+                                                                                </span>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        }
+                                                        return null;
+                                                    }}
+                                                />
+                                                {enableRandomFloat && (
+                                                    <Area 
+                                                        type="monotone" 
+                                                        dataKey="netWorthRange" 
+                                                        stroke="none" 
+                                                        fill="#8b5cf6" 
+                                                        fillOpacity={0.15}
+                                                        activeDot={false}
+                                                    />
+                                                )}
+                                                <Area 
+                                                    type="monotone" 
+                                                    dataKey="netWorth" 
+                                                    stroke="#a78bfa" 
+                                                    strokeWidth={3}
+                                                    fillOpacity={1} 
+                                                    fill="url(#colorNetWorth)"
+                                                    activeDot={{ r: 6, fill: '#fff', stroke: '#a78bfa', strokeWidth: 2, filter: 'url(#glow)' }}
+                                                />
+                                                {(!enableRandomFloat && hitZeroAge !== null) && (
+                                                    <ReferenceDot 
+                                                        x={hitZeroAge} 
+                                                        y={0} 
+                                                        shape={<CustomReferenceDot hitZeroAge={hitZeroAge} />}
+                                                    />
+                                                )}
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    ) : (
+                                        <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 border border-dashed border-white/10 rounded-2xl bg-black/20">
+                                            <span>請在上方輸入所有數值以檢視圖表</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* 蒙地卡羅情境的說明文字 */}
+                                {enableRandomFloat && returnMode === 'p25' && (
+                                    <div className="mt-4 p-4 rounded-xl bg-rose-950/30 border border-rose-500/30 text-xs text-rose-200/90 leading-relaxed backdrop-blur-sm animate-slide-down">
+                                        <strong className="text-rose-400 font-medium">壓力測試（逆風局、第 25 百分位數）：</strong>你的運氣不太好，可能在你剛退休前幾年，或是投資中途，頻繁遇到全球經濟衰退。市場大跌把你的本金不斷啃食。
+                                    </div>
+                                )}
+                                {enableRandomFloat && returnMode === 'p50' && (
+                                    <div className="mt-4 p-4 rounded-xl bg-amber-950/30 border border-amber-500/30 text-xs text-amber-200/90 leading-relaxed backdrop-blur-sm animate-slide-down">
+                                        <strong className="text-amber-400 font-medium">平均預期（常態局、第 50 百分位數）：</strong>市場景氣中規中矩，有金融海嘯也有經濟繁榮，基本符合過去大盤的歷史平均報酬。
+                                    </div>
+                                )}
+                                {enableRandomFloat && returnMode === 'p75' && (
+                                    <div className="mt-4 p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/30 text-xs text-emerald-200/90 leading-relaxed backdrop-blur-sm animate-slide-down">
+                                        <strong className="text-emerald-400 font-medium">牛市起飛（順風局、第 75 百分位數）：</strong>你遇到了經濟發展的黃金年代，雖然偶有小跌，但大趨勢一路狂飆，資產利滾利產生巨大的核爆級效應。
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* 內容區塊 2：所得與支出分布 */}
+                        {activeTab === 'incomeExpense' && (
+                            <div className="animate-fade-in">
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+                                    <div className="flex flex-wrap items-center gap-4 bg-black/20 px-4 py-2 rounded-full border border-white/10">
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.8)]" style={{ backgroundColor: '#34d399' }}></span>
+                                            <span className="text-sm font-medium text-slate-300">{incomeViewType === 'cumulative' ? '累積勞動收入' : '勞動收入'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_rgba(96,165,250,0.8)]" style={{ backgroundColor: '#60a5fa' }}></span>
+                                            <span className="text-sm font-medium text-slate-300">{incomeViewType === 'cumulative' ? '累積資本所得' : '資本所得 (含虧損)'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_rgba(251,113,133,0.8)]" style={{ backgroundColor: '#fb7185' }}></span>
+                                            <span className="text-sm font-medium text-slate-300">{incomeViewType === 'cumulative' ? '累積日常支出' : '日常支出'}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-wrap items-center gap-3">
+                                        <div className="flex bg-black/40 rounded-lg border border-white/10 p-1 shadow-inner">
+                                            <button 
+                                                className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all ${currencyType === 'today' ? 'bg-white/10 text-white shadow-sm border border-white/10' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
+                                                onClick={() => setCurrencyType('today')}
+                                            >
+                                                今天幣值
+                                            </button>
+                                            <button 
+                                                className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all ${currencyType === 'future' ? 'bg-white/10 text-white shadow-sm border border-white/10' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
+                                                onClick={() => setCurrencyType('future')}
+                                            >
+                                                未來幣值
+                                            </button>
+                                        </div>
+                                        <div className="flex bg-black/40 rounded-lg border border-white/10 p-1 shadow-inner">
+                                            <button 
+                                                className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all ${incomeViewType === 'annual' ? 'bg-white/10 text-white shadow-sm border border-white/10' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
+                                                onClick={() => setIncomeViewType('annual')}
+                                            >
+                                                年度視角
+                                            </button>
+                                            <button 
+                                                className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all ${incomeViewType === 'cumulative' ? 'bg-white/10 text-white shadow-sm border border-white/10' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
+                                                onClick={() => setIncomeViewType('cumulative')}
+                                            >
+                                                生涯累積視角
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="h-[450px] w-full relative z-10">
+                                    {chartData.length > 0 ? (
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart data={chartData} margin={{ top: 35, right: 30, left: 20, bottom: 20 }}>
+                                                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="rgba(255,255,255,0.15)" />
+                                                <XAxis 
+                                                    dataKey="age" 
+                                                    tick={{ fill: '#94a3b8', fontSize: 12 }}
+                                                    tickLine={false}
+                                                    axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                                                    dy={10}
+                                                    label={{ value: '年齡', position: 'insideBottom', offset: -15, fill: '#64748b', fontSize: 12 }}
+                                                />
+                                                <YAxis 
+                                                    tickCount={15}
+                                                    tickFormatter={formatYAxis} 
+                                                    tick={{ fill: '#94a3b8', fontSize: 12, fontFamily: 'monospace' }}
+                                                    tickLine={false}
+                                                    axisLine={false}
+                                                    dx={-10}
+                                                />
+                                                <Tooltip 
+                                                    formatter={(value, name) => [formatCurrencyText(value), name]}
+                                                    labelFormatter={(label) => `${label} 歲`}
+                                                    contentStyle={{ 
+                                                        backgroundColor: 'rgba(15, 23, 42, 0.85)', 
+                                                        backdropFilter: 'blur(12px)',
+                                                        borderColor: 'rgba(255,255,255,0.1)', 
+                                                        borderRadius: '12px', 
+                                                        color: '#f8fafc', 
+                                                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1)',
+                                                        border: '1px solid rgba(255,255,255,0.1)'
+                                                    }}
+                                                />
+                                                <Line 
+                                                    type="monotone" 
+                                                    dataKey={incomeViewType === 'cumulative' ? 'accLabor' : 'laborIncome'} 
+                                                    name={incomeViewType === 'cumulative' ? '累積勞動收入' : '勞動收入'} 
+                                                    stroke="#34d399" 
+                                                    strokeWidth={3} 
+                                                    dot={false} 
+                                                    activeDot={{ r: 6, fill: '#10b981', stroke: '#fff', strokeWidth: 2 }} 
+                                                />
+                                                <Line 
+                                                    type="monotone" 
+                                                    dataKey={incomeViewType === 'cumulative' ? 'accCapital' : 'capitalIncome'} 
+                                                    name={incomeViewType === 'cumulative' ? '累積資本所得' : '資本所得 (含虧損)'} 
+                                                    stroke="#60a5fa" 
+                                                    strokeWidth={3} 
+                                                    dot={false} 
+                                                    activeDot={{ r: 6, fill: '#3b82f6', stroke: '#fff', strokeWidth: 2 }} 
+                                                />
+                                                <Line 
+                                                    type="monotone" 
+                                                    dataKey={incomeViewType === 'cumulative' ? 'accExpense' : 'expense'} 
+                                                    name={incomeViewType === 'cumulative' ? '累積日常支出' : '日常支出'} 
+                                                    stroke="#fb7185" 
+                                                    strokeWidth={3} 
+                                                    strokeDasharray="6 6" 
+                                                    dot={false} 
+                                                    activeDot={{ r: 6, fill: '#e11d48', stroke: '#fff', strokeWidth: 2 }} 
+                                                />
+                                                
+                                                {incomeViewType === 'annual' && hitFIAge !== null && chartData.find(d => d.age === hitFIAge) && (
+                                                    <ReferenceDot 
+                                                        x={hitFIAge} 
+                                                        y={chartData.find(d => d.age === hitFIAge).capitalIncome} 
+                                                        shape={<CustomFIReferenceDot hitFIAge={hitFIAge} />}
+                                                    />
+                                                )}
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    ) : (
+                                        <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 border border-dashed border-white/10 rounded-2xl bg-black/20">
+                                            <span>請在上方輸入所有數值以檢視圖表</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* 生涯花費總覽與財富軌跡總結 */}
+                                <div className="mt-6 p-4 md:p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md shadow-inner">
+                                    <h3 className="text-sm font-semibold text-brand-300 mb-1.5 flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-brand-400"></span>
+                                        生涯花費與財富軌跡總覽
+                                    </h3>
+                                    <p className="text-xs md:text-sm text-slate-300/90 leading-relaxed font-light">
+                                        在您規劃的整體生涯期間，預計總共透過工作賺取 <strong className="text-emerald-400 font-medium">{formatCurrencyText(lifetimeSummary.totalLabor)}</strong> 的勞動收入，透過複利投資滾出 <strong className="text-blue-400 font-medium">{formatCurrencyText(lifetimeSummary.totalCapital)}</strong> 的資本所得，而一生的總日常支出預計為 <strong className="text-rose-400 font-medium">{formatCurrencyText(lifetimeSummary.totalExpense)}</strong>。
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* 頁尾免責聲明與版權宣告（彼此等距、緊湊底部） */}
+                    <footer className="text-center text-[11px] text-slate-500/80 space-y-0.5 font-light leading-normal pb-2 md:pb-0">
+                        <p>免責聲明：本計算器僅供財務規劃與教育參考，所有模擬均基於數學模型與假設數據（如年化報酬、通膨）。不構成具體投資建議。</p>
+                        <p>© 2026 Snap Retire by <a href="https://lanzul.com" target="_blank" rel="noopener noreferrer" className="underline text-inherit hover:text-slate-300 transition-colors">lanzul</a>. All rights reserved.</p>
+                    </footer>
+
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<RetirementCalculator />);
+    </script>
+</body>
+</html>
