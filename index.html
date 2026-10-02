@@ -2,16 +2,19 @@
 <html lang="zh-TW" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>退休速算_Snap Retire by lanzul</title>
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-is@18/umd/react-is.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/recharts@2.1.12/umd/Recharts.js"></script>
-    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/react-is@18.2.0/umd/react-is.production.min.js"></script>
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/recharts@2.1.12/umd/Recharts.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -19,7 +22,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        sans: ['Inter', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', 'system-ui', 'sans-serif'],
                     },
                     colors: {
                         glass: {
@@ -28,18 +31,18 @@
                             highlight: 'rgba(255, 255, 255, 0.12)',
                         },
                         brand: {
-                            400: '#a78bfa',
+                            200: '#ddd6fe', 300: '#c4b5fd', 400: '#a78bfa',
                             500: '#8b5cf6',
-                            600: '#7c3aed',
+                            600: '#7c3aed', 900: '#4c1d95', 950: '#2e1065',
                         }
                     },
                     animation: {
-                        'blob': 'blob 20s infinite',
+                        'blob': 'blob 20s infinite', 'fade-in': 'fadeIn 0.5s ease-out forwards',
                         'slide-down': 'slideDown 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
                     },
                     keyframes: {
-                        blob: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } }, blob: {
                             '0%': { transform: 'translate(0px, 0px) scale(1)' },
                             '33%': { transform: 'translate(25px, -35px) scale(1.06)' },
                             '66%': { transform: 'translate(-20px, 20px) scale(0.94)' },
@@ -60,7 +63,7 @@
     </script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
 
         body {
             background: linear-gradient(135deg, #090a0f 0%, #12141c 50%, #07090e 100%);
@@ -143,6 +146,20 @@
             background: linear-gradient(180deg, #f3e8ff 0%, #c4b5fd 40%, #8b5cf6 100%);
             transform: scale(1.12);
         }
+    
+        :root { color-scheme: dark; box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+        button:focus-visible, select:focus-visible, input[type=checkbox]:focus-visible { outline: 2px solid #a78bfa; outline-offset: 2px; }
+        .crystal-slider:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(167,139,250,0.55); }
+        @media (max-width: 768px) {
+            .glass-panel { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+            .animate-blob { animation: none !important; }
+        }
+        @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+            .glass-panel { background: rgba(18, 24, 38, 0.92); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
     </style>
 </head>
 <body class="font-sans antialiased relative min-h-screen">
@@ -157,7 +174,7 @@
     <div id="root" class="relative z-10"></div>
 
     <script type="text/babel" data-type="module">
-        const { useState, useEffect, useMemo, useCallback, useRef } = React;
+        const { useState, useEffect, useMemo, useCallback, useRef, useDeferredValue } = React;
         const { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } = window.Recharts; 
 
         // 破產紅點元件
@@ -192,6 +209,22 @@
             );
         };
 
+        const gaussian = (prng) => {
+            let u = prng(), v = prng();
+            if (u === 0) u = 1e-4; if (v === 0) v = 1e-4;
+            return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+        };
+        // 對數常態 + 厚尾(t, ν=5)：年均預期報酬 = mean%，不會低於 -100%，且左尾比常態分布更肥
+        const drawReturn = (prng, mean, sigma) => {
+            const nu = 5; let chi = 0;
+            for (let k = 0; k < nu; k++) { const g = gaussian(prng); chi += g * g; }
+            let tv = gaussian(prng) / Math.sqrt(chi / nu) * Math.sqrt((nu - 2) / nu);
+            tv = Math.max(-4, Math.min(4, tv));
+            const mu = 1 + mean / 100;
+            const s2 = Math.log(1 + Math.pow(sigma / 100 / mu, 2));
+            return (Math.exp(Math.log(mu) - s2 / 2 + Math.sqrt(s2) * tv) - 1) * 100;
+        };
+
         function RetirementCalculator() {
             const [workStatus, setWorkStatus] = useState('working'); 
             const [currentAge, setCurrentAge] = useState(30);
@@ -200,7 +233,11 @@
 
             const [netWorth, setNetWorth] = useState(3000000);
             const [monthlyExpense, setMonthlyExpense] = useState(30000);
-            const [annualSavings, setAnnualSavings] = useState(300000);
+            const [annualIncome, setAnnualIncome] = useState(660000);
+            const [enablePension, setEnablePension] = useState(false);
+            const [pensionMonthly, setPensionMonthly] = useState(0);
+            const [pensionStartAge, setPensionStartAge] = useState(65);
+            const [currency, setCurrency] = useState('NT$');
 
             const [investmentReturn, setInvestmentReturn] = useState(7);
             const [inflationRate, setInflationRate] = useState(3);
@@ -219,10 +256,20 @@
 
             const [netWorthStr, setNetWorthStr] = useState('3,000,000');
             const [monthlyExpenseStr, setMonthlyExpenseStr] = useState('30,000');
-            const [annualSavingsStr, setAnnualSavingsStr] = useState('300,000');
+            const [annualIncomeStr, setAnnualIncomeStr] = useState('660,000');
+            const [pensionMonthlyStr, setPensionMonthlyStr] = useState('');
+            const [investmentReturnStr, setInvestmentReturnStr] = useState('7');
+            const [inflationRateStr, setInflationRateStr] = useState('3');
 
             const [keepGrowingExpense, setKeepGrowingExpense] = useState(false);
             const [keepGrowingNetWorth, setKeepGrowingNetWorth] = useState(false);
+            const annualSavings = (annualIncome === '' || monthlyExpense === '') ? '' : Number(annualIncome) - Number(monthlyExpense) * 12;
+            const rateChange = (setNum, setStr) => (e) => {
+                const raw = e.target.value.replace(/[^\d.\-]/g, '').replace(/(?!^)-/g, '').replace(/(\..*)\./g, '$1').slice(0, 6);
+                setStr(raw);
+                const n = parseFloat(raw);
+                setNum(isNaN(n) ? '' : Math.min(Math.max(n, -20), 30));
+            };
 
             const formatNumber = (num) => {
                 if (num === null || num === undefined || num === '') return '';
@@ -232,67 +279,37 @@
             };
 
             const formatCurrencyText = (num) => {
-                if (num === null || num === undefined) return '$0';
+                if (num === null || num === undefined) return currency + '0';
                 const isNeg = num < 0;
                 const absVal = Math.abs(num);
-                return `${isNeg ? '-$' : '$'}${formatNumber(absVal)}`;
+                return `${isNeg ? '-' : ''}${currency}${formatNumber(absVal)}`;
             };
 
-            // 自動平衡機制：當勾選「保持成長」時，動態計算並調整淨資產或每月開銷
+            // 自動平衡：收入固定時，開銷越高儲蓄越少，因此用封閉解直接求出不振盪的結果
             useEffect(() => {
-                if (enableRandomFloat) return;
-
-                const baseRet = Number(investmentReturn);
-                const infRate = Number(inflationRate);
-                const realReturnRate = (1 + baseRet / 100) / (1 + infRate / 100) - 1;
-
-                if (realReturnRate <= 0) {
-                    if (keepGrowingNetWorth) setKeepGrowingNetWorth(false);
-                    if (keepGrowingExpense) setKeepGrowingExpense(false);
-                    return;
-                }
-
+                if (enableRandomFloat || (!keepGrowingNetWorth && !keepGrowingExpense)) return;
+                const r = (1 + Number(investmentReturn) / 100) / (1 + Number(inflationRate) / 100) - 1;
+                if (!(r > 0)) { setKeepGrowingNetWorth(false); setKeepGrowingExpense(false); return; }
+                const working = workStatus === 'working' && retireAge > currentAge;
+                const n = working ? retireAge - currentAge : 0;
+                const A = Math.pow(1 + r, n);
+                const F = working ? (1 + r) * (A - 1) / r : 0;
+                const I = working ? (Number(annualIncome) || 0) : 0;
+                const startAge = working ? Number(retireAge) : Number(currentAge);
+                const pen = enablePension && Number(pensionStartAge) <= startAge ? (Number(pensionMonthly) || 0) * 12 : 0;
                 if (keepGrowingNetWorth) {
-                    const yearlyExpense = monthlyExpense * 12;
-                    const targetWRetire = (yearlyExpense * (1 + realReturnRate)) / realReturnRate;
-                    let requiredCurrentNW = targetWRetire;
-
-                    if (workStatus === 'working' && retireAge > currentAge) {
-                        const yearsToRetire = retireAge - currentAge;
-                        const annSav = Number(annualSavings);
-                        const r = realReturnRate;
-                        
-                        const fvSavings = annSav * (1 + r) * (Math.pow(1 + r, yearsToRetire) - 1) / r;
-                        requiredCurrentNW = (targetWRetire - fvSavings) / Math.pow(1 + r, yearsToRetire);
-                    }
-
-                    const targetNetWorth = Math.ceil(Math.max(0, requiredCurrentNW));
-                    
-                    if (netWorth !== targetNetWorth) {
-                        setNetWorth(targetNetWorth);
-                        setNetWorthStr(formatNumber(targetNetWorth));
-                    }
-                } else if (keepGrowingExpense) {
-                    let projectedWRetire = netWorth;
-                    const r = realReturnRate;
-                    
-                    if (workStatus === 'working' && retireAge > currentAge) {
-                        const yearsToRetire = retireAge - currentAge;
-                        const annSav = Number(annualSavings);
-                        
-                        const fvSavings = annSav * (1 + r) * (Math.pow(1 + r, yearsToRetire) - 1) / r;
-                        projectedWRetire = netWorth * Math.pow(1 + r, yearsToRetire) + fvSavings;
-                    }
-
-                    const targetYearlyExpense = (projectedWRetire * r) / (1 + r);
-                    const targetExpense = Math.floor(Math.max(0, targetYearlyExpense / 12));
-                    
-                    if (monthlyExpense !== targetExpense) {
-                        setMonthlyExpense(targetExpense);
-                        setMonthlyExpenseStr(formatNumber(targetExpense));
-                    }
+                    const Ey = Number(monthlyExpense) * 12;
+                    const wRetire = Math.max(0, Ey - pen) * (1 + r) / r;
+                    const req = working ? (wRetire - (I - Ey) * F) / A : wRetire;
+                    const target = Math.ceil(Math.max(0, req));
+                    if (netWorth !== target) { setNetWorth(target); setNetWorthStr(formatNumber(target)); }
+                } else {
+                    const k = r / (1 + r);
+                    const Ey = working ? (k * (Number(netWorth) * A + I * F) + pen) / A : k * Number(netWorth) + pen;
+                    const target = Math.floor(Math.max(0, Ey / 12));
+                    if (monthlyExpense !== target) { setMonthlyExpense(target); setMonthlyExpenseStr(formatNumber(target)); }
                 }
-            }, [keepGrowingNetWorth, keepGrowingExpense, monthlyExpense, netWorth, investmentReturn, inflationRate, workStatus, annualSavings, currentAge, retireAge, enableRandomFloat]);
+            }, [keepGrowingNetWorth, keepGrowingExpense, monthlyExpense, netWorth, investmentReturn, inflationRate, workStatus, annualIncome, enablePension, pensionMonthly, pensionStartAge, currentAge, retireAge, enableRandomFloat]);
 
             const handleNetWorthChange = (e) => {
                 setKeepGrowingNetWorth(false);
@@ -320,29 +337,29 @@
                 }
             };
 
-            const handleAnnualSavingsChange = (e) => {
+            const handleAnnualIncomeChange = (e) => {
                 setKeepGrowingExpense(false);
                 setKeepGrowingNetWorth(false);
-                const rawValue = e.target.value.replace(/\D/g, '');
-                if (rawValue !== '') {
-                    const numValue = parseInt(rawValue, 10);
-                    setAnnualSavings(numValue);
-                    setAnnualSavingsStr(formatNumber(numValue));
-                } else {
-                    setAnnualSavings('');
-                    setAnnualSavingsStr('');
-                }
+                const raw = e.target.value.replace(/\D/g, '');
+                if (raw !== '') { const v = parseInt(raw, 10); setAnnualIncome(v); setAnnualIncomeStr(formatNumber(v)); }
+                else { setAnnualIncome(''); setAnnualIncomeStr(''); }
+            };
+
+            const handlePensionChange = (e) => {
+                const raw = e.target.value.replace(/\D/g, '');
+                if (raw !== '') { const v = parseInt(raw, 10); setPensionMonthly(v); setPensionMonthlyStr(formatNumber(v)); }
+                else { setPensionMonthly(0); setPensionMonthlyStr(''); }
             };
 
             const formatYAxis = (tickItem) => {
-                if (tickItem === 0) return '$0';
+                if (tickItem === 0) return currency + '0';
                 const absVal = Math.abs(tickItem);
                 const sign = tickItem < 0 ? '-' : '';
                 if (absVal >= 100000000) {
                     const billionVal = absVal / 100000000;
-                    return `${sign}$${parseFloat(billionVal.toFixed(1))}億`;
+                    return `${sign}${currency}${parseFloat(billionVal.toFixed(1))}億`;
                 }
-                return `${sign}$${formatNumber(absVal / 10000)}萬`;
+                return `${sign}${currency}${formatNumber(absVal / 10000)}萬`;
             };
 
             const mulberry32 = (a) => {
@@ -358,7 +375,7 @@
                 const nw = testNetWorth !== undefined ? testNetWorth : netWorth;
                 const exp = testExpense !== undefined ? testExpense : monthlyExpense;
 
-                if (currentAge === '' || lifeExpectancy === '' || nw === '' || exp === '' || investmentReturn === '' || inflationRate === '' || (workStatus === 'working' && annualSavings === '')) {
+                if (currentAge === '' || lifeExpectancy === '' || nw === '' || exp === '' || investmentReturn === '' || inflationRate === '' || (workStatus === 'working' && annualSavings === '') || Number(lifeExpectancy) <= Number(currentAge)) {
                     return { data: [], hitZeroAge: null, hitFIAge: null, mcSuccessRate: null };
                 }
 
@@ -370,6 +387,8 @@
                 const curAge = Number(currentAge);
                 const lifeExp = Number(lifeExpectancy);
                 const retAge = Number(retireAge);
+                const penYear = enablePension ? (Number(pensionMonthly) || 0) * 12 : 0;
+                const penAge = pensionStartAge === '' ? 65 : Number(pensionStartAge);
                 const annSav = Number(annualSavings);
 
                 const yearlyExpense = mthExp * 12;
@@ -391,6 +410,7 @@
                 if (!enableRandomFloat) {
                     for (let age = startAge; age <= endAge; age++) {
                         const yearIdx = age - startAge;
+                        const pen = age >= penAge ? penYear : 0;
 
                         const roundedWorth = Math.max(0, Math.round(currentWorth));
                         const netChange = age === startAge ? 0 : roundedWorth - prevWorthForDiff;
@@ -418,29 +438,30 @@
                         }
 
                         const realReturnRate = (1 + baseRet / 100) / (1 + infRate / 100) - 1;
-                        let currentExp = 0, currentLabor = 0, currentCap = 0;
+                        let currentExp = 0, currentLabor = pen, currentCap = 0;
 
                         if (currencyType === 'today') {
                             currentCap = currentWorth > 0 ? currentWorth * realReturnRate : 0;
                             currentExp = yearlyExpense;
                             if (workStatus === 'working' && age < retAge) {
-                                currentLabor = yearlyExpense + annSav;
-                                currentWorth = (currentWorth + annSav) * (1 + realReturnRate);
+                                currentLabor = yearlyExpense + annSav + pen;
+                                currentWorth = (currentWorth + annSav + pen) * (1 + realReturnRate);
                             } else {
-                                currentWorth = (currentWorth - yearlyExpense) * (1 + realReturnRate);
+                                currentWorth = (currentWorth - yearlyExpense + pen) * (1 + realReturnRate);
                             }
                         } else {
                             const infMultiplier = Math.pow(1 + infRate / 100, yearIdx);
                             currentExp = yearlyExpense * infMultiplier;
+                            currentLabor = pen * infMultiplier;
                             currentCap = currentWorth > 0 ? currentWorth * (baseRet / 100) : 0;
                             
                             if (workStatus === 'working' && age < retAge) {
-                                currentLabor = (yearlyExpense + annSav) * infMultiplier;
+                                currentLabor = (yearlyExpense + annSav + pen) * infMultiplier;
                                 const futureSavings = annSav * infMultiplier;
-                                currentWorth = (currentWorth + futureSavings) * (1 + baseRet / 100);
+                                currentWorth = (currentWorth + futureSavings + pen * infMultiplier) * (1 + baseRet / 100);
                             } else {
                                 const futureYearlyExpense = yearlyExpense * infMultiplier;
-                                currentWorth = (currentWorth - futureYearlyExpense) * (1 + baseRet / 100);
+                                currentWorth = (currentWorth - futureYearlyExpense + pen * infMultiplier) * (1 + baseRet / 100);
                             }
                         }
 
@@ -473,10 +494,8 @@
 
                     for (let age = startAge; age <= endAge; age++) {
                         const yearIdx = age - startAge;
-                        let u = prng(), v = prng();
-                        if(u === 0) u = 0.0001; if(v === 0) v = 0.0001;
-                        let z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-                        let effectiveRet = baseRet + z * sigma;
+                        const pen = age >= penAge ? penYear : 0;
+                        const effectiveRet = drawReturn(prng, baseRet, sigma);
                         returns.push(effectiveRet);
 
                         if (tempWorth <= 0) {
@@ -486,18 +505,18 @@
                         const realReturnRate = (1 + effectiveRet / 100) / (1 + infRate / 100) - 1;
                         if (currencyType === 'today') {
                             if (workStatus === 'working' && age < retAge) {
-                                tempWorth = (tempWorth + annSav) * (1 + realReturnRate);
+                                tempWorth = (tempWorth + annSav + pen) * (1 + realReturnRate);
                             } else {
-                                tempWorth = (tempWorth - yearlyExpense) * (1 + realReturnRate);
+                                tempWorth = (tempWorth - yearlyExpense + pen) * (1 + realReturnRate);
                             }
                         } else {
                             const infMultiplier = Math.pow(1 + infRate / 100, yearIdx);
                             if (workStatus === 'working' && age < retAge) {
                                 const futureSavings = annSav * infMultiplier;
-                                tempWorth = (tempWorth + futureSavings) * (1 + effectiveRet / 100);
+                                tempWorth = (tempWorth + futureSavings + pen * infMultiplier) * (1 + effectiveRet / 100);
                             } else {
                                 const futureYearlyExpense = yearlyExpense * infMultiplier;
-                                tempWorth = (tempWorth - futureYearlyExpense) * (1 + effectiveRet / 100);
+                                tempWorth = (tempWorth - futureYearlyExpense + pen * infMultiplier) * (1 + effectiveRet / 100);
                             }
                         }
                         netWorths.push(tempWorth);
@@ -528,6 +547,7 @@
 
                 for (let age = startAge; age <= endAge; age++) {
                     const yearIdx = age - startAge;
+                        const pen = age >= penAge ? penYear : 0;
                     const effectiveRet = repSim.returns[yearIdx];
 
                     const roundedWorth = Math.max(0, Math.round(currentWorth));
@@ -560,29 +580,30 @@
                     }
 
                     const realReturnRate = (1 + effectiveRet / 100) / (1 + infRate / 100) - 1;
-                    let currentExp = 0, currentLabor = 0, currentCap = 0;
+                    let currentExp = 0, currentLabor = pen, currentCap = 0;
 
                     if (currencyType === 'today') {
                         currentCap = currentWorth > 0 ? currentWorth * realReturnRate : 0;
                         currentExp = yearlyExpense;
                         if (workStatus === 'working' && age < retAge) {
-                            currentLabor = yearlyExpense + annSav;
-                            currentWorth = (currentWorth + annSav) * (1 + realReturnRate);
+                            currentLabor = yearlyExpense + annSav + pen;
+                            currentWorth = (currentWorth + annSav + pen) * (1 + realReturnRate);
                         } else {
-                            currentWorth = (currentWorth - yearlyExpense) * (1 + realReturnRate);
+                            currentWorth = (currentWorth - yearlyExpense + pen) * (1 + realReturnRate);
                         }
                     } else {
                         const infMultiplier = Math.pow(1 + infRate / 100, yearIdx);
                         currentExp = yearlyExpense * infMultiplier;
+                            currentLabor = pen * infMultiplier;
                         currentCap = currentWorth > 0 ? currentWorth * (effectiveRet / 100) : 0;
                         
                         if (workStatus === 'working' && age < retAge) {
-                            currentLabor = (yearlyExpense + annSav) * infMultiplier;
+                            currentLabor = (yearlyExpense + annSav + pen) * infMultiplier;
                             const futureSavings = annSav * infMultiplier;
-                            currentWorth = (currentWorth + futureSavings) * (1 + effectiveRet / 100);
+                            currentWorth = (currentWorth + futureSavings + pen * infMultiplier) * (1 + effectiveRet / 100);
                         } else {
                             const futureYearlyExpense = yearlyExpense * infMultiplier;
-                            currentWorth = (currentWorth - futureYearlyExpense) * (1 + effectiveRet / 100);
+                            currentWorth = (currentWorth - futureYearlyExpense + pen * infMultiplier) * (1 + effectiveRet / 100);
                         }
                     }
 
@@ -598,11 +619,10 @@
 
                 return { data, hitZeroAge: repSim.hitZeroAge, hitFIAge, mcSuccessRate: computedMcRate };
 
-            }, [currentAge, lifeExpectancy, netWorth, monthlyExpense, investmentReturn, inflationRate, workStatus, annualSavings, retireAge, currencyType, enableRandomFloat, returnMode, volatilityLevel, randomSeed]);
+            }, [currentAge, lifeExpectancy, netWorth, monthlyExpense, investmentReturn, inflationRate, workStatus, annualSavings, retireAge, currencyType, enableRandomFloat, returnMode, volatilityLevel, randomSeed, enablePension, pensionMonthly, pensionStartAge]);
 
-            const chartDataObj = useMemo(() => {
-                return simulateChart();
-            }, [simulateChart]);
+            const deferredSim = useDeferredValue(simulateChart);
+            const chartDataObj = useMemo(() => deferredSim(), [deferredSim]);
 
             const chartData = chartDataObj.data;
             const hitZeroAge = chartDataObj.hitZeroAge;
@@ -628,6 +648,14 @@
                 totalCapital: chartData[chartData.length - 1].accCapital,
                 totalExpense: chartData[chartData.length - 1].accExpense
             } : { totalLabor: 0, totalCapital: 0, totalExpense: 0 };
+
+            const errors = [];
+            if (workStatus === 'working' && retireAge !== '' && currentAge !== '' && Number(retireAge) < Number(currentAge)) errors.push('退休年齡不能小於目前年齡。');
+            if (lifeExpectancy !== '' && currentAge !== '' && Number(lifeExpectancy) <= Math.max(Number(currentAge), workStatus === 'working' ? Number(retireAge) || 0 : 0)) errors.push('預期壽命必須大於目前年齡與退休年齡。');
+            if (workStatus === 'working' && annualSavings !== '' && annualSavings < 0) errors.push('每年開銷高於稅後收入，退休前資產會逐年減少。');
+            const sigmaNow = { low: 5, mid: 10, high: 15 }[volatilityLevel] || 15;
+            const muNow = Math.max(0.05, 1 + (Number(investmentReturn) || 0) / 100);
+            const geoRet = (Math.exp(Math.log(muNow) - Math.log(1 + Math.pow(sigmaNow / 100 / muNow, 2)) / 2) - 1) * 100;
 
             return (
                 <div className="max-w-[1400px] mx-auto p-4 md:p-8 w-full flex flex-col gap-6 md:gap-8 z-10 relative">
@@ -667,7 +695,7 @@
                                             <input 
                                                 type="text"
                                                 inputMode="numeric"
-                                                value={currentAge}
+                                                aria-label="目前年齡" value={currentAge}
                                                 onChange={(e) => { setCurrentAge(e.target.value.replace(/\D/g, '') === '' ? '' : Number(e.target.value.replace(/\D/g, ''))); setKeepGrowingExpense(false); setKeepGrowingNetWorth(false); }}
                                                 className="w-16 p-1.5 text-right glass-input rounded-lg font-medium text-white focus:outline-none"
                                             />
@@ -679,7 +707,7 @@
                                         min="20" max="100" 
                                         value={currentAge || 20} 
                                         onChange={(e) => { setCurrentAge(Number(e.target.value)); setKeepGrowingExpense(false); setKeepGrowingNetWorth(false); }}
-                                        className="crystal-slider"
+                                        aria-label="目前年齡" className="crystal-slider"
                                     />
                                 </div>
 
@@ -691,7 +719,7 @@
                                                 <input 
                                                     type="text" 
                                                     inputMode="numeric"
-                                                    value={retireAge}
+                                                    aria-label="預計退休年齡" value={retireAge}
                                                     onChange={(e) => { setRetireAge(e.target.value.replace(/\D/g, '') === '' ? '' : Number(e.target.value.replace(/\D/g, ''))); setKeepGrowingExpense(false); setKeepGrowingNetWorth(false); }}
                                                     className="w-16 p-1.5 text-right glass-input rounded-lg font-medium text-white focus:outline-none"
                                                 />
@@ -703,7 +731,7 @@
                                             min={currentAge || 20} max={lifeExpectancy || 100} 
                                             value={retireAge || (currentAge || 20)} 
                                             onChange={(e) => { setRetireAge(Number(e.target.value)); setKeepGrowingExpense(false); setKeepGrowingNetWorth(false); }}
-                                            className="crystal-slider"
+                                            aria-label="預計退休年齡" className="crystal-slider"
                                         />
                                     </div>
                                 )}
@@ -718,7 +746,7 @@
                                             <input 
                                                 type="text" 
                                                 inputMode="numeric"
-                                                value={lifeExpectancy}
+                                                aria-label="預計壽命" value={lifeExpectancy}
                                                 onChange={(e) => { setLifeExpectancy(e.target.value.replace(/\D/g, '') === '' ? '' : Number(e.target.value.replace(/\D/g, ''))); setKeepGrowingExpense(false); setKeepGrowingNetWorth(false); }}
                                                 className="w-16 p-1.5 text-right glass-input rounded-lg font-medium text-white focus:outline-none"
                                             />
@@ -730,7 +758,7 @@
                                         min={currentAge || 20} max="120" 
                                         value={lifeExpectancy || (currentAge || 20)} 
                                         onChange={(e) => { setLifeExpectancy(Number(e.target.value)); setKeepGrowingExpense(false); setKeepGrowingNetWorth(false); }}
-                                        className="crystal-slider"
+                                        aria-label="預計壽命" className="crystal-slider"
                                     />
                                 </div>
                             </div>
@@ -768,13 +796,13 @@
                                     </div>
                                     <p className="text-xs text-slate-400/80 mb-3 font-light">包含投資帳戶、加密貨幣、現金、債券、房產淨值。</p>
                                     <div className="relative group">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium group-focus-within:text-brand-400 transition-colors">$</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium group-focus-within:text-brand-400 transition-colors">{currency}</span>
                                         <input 
                                             type="text" 
                                             inputMode="numeric"
-                                            value={netWorthStr}
+                                            aria-label="淨資產" value={netWorthStr}
                                             onChange={handleNetWorthChange}
-                                            className="w-full pl-8 pr-4 py-3.5 glass-input rounded-xl text-lg font-medium text-white transition-all"
+                                            className="w-full pl-14 pr-4 py-3.5 glass-input rounded-xl text-lg font-medium text-white transition-all"
                                         />
                                     </div>
                                 </div>
@@ -800,13 +828,13 @@
                                     </div>
                                     <p className="text-xs text-slate-400/80 mb-3 font-light">我們假設退休後維持同樣的生活水準。</p>
                                     <div className="relative group mb-5">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium group-focus-within:text-brand-400 transition-colors">$</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium group-focus-within:text-brand-400 transition-colors">{currency}</span>
                                         <input 
                                             type="text" 
                                             inputMode="numeric"
-                                            value={monthlyExpenseStr}
+                                            aria-label="每月開銷" value={monthlyExpenseStr}
                                             onChange={handleMonthlyExpenseChange}
-                                            className="w-full pl-8 pr-14 py-3.5 glass-input rounded-xl text-lg font-medium text-white transition-all"
+                                            className="w-full pl-14 pr-14 py-3.5 glass-input rounded-xl text-lg font-medium text-white transition-all"
                                         />
                                         <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm border-l border-white/10 pl-3">/ 月</span>
                                     </div>
@@ -820,34 +848,56 @@
                                             setMonthlyExpense(val);
                                             setMonthlyExpenseStr(formatNumber(val));
                                         }}
-                                        className="crystal-slider"
+                                        aria-label="每月開銷" className="crystal-slider"
                                     />
                                 </div>
 
                                 {workStatus === 'working' && (
                                     <div className="animate-fade-in-up">
-                                        <label className="block text-sm font-medium mb-1 text-slate-300">
-                                            每年可儲蓄金額
-                                            {annualSavings !== '' && monthlyExpense !== '' && (Number(annualSavings) + Number(monthlyExpense) * 12) > 0 && (
-                                                <span className="text-brand-400 font-semibold ml-2 text-xs tracking-wide">
-                                                    (儲蓄率：{((Number(annualSavings) / (Number(annualSavings) + Number(monthlyExpense) * 12)) * 100).toFixed(1)}%)
-                                                </span>
-                                            )}
-                                        </label>
-                                        <p className="text-xs text-slate-400/80 mb-3 font-light">這筆錢將在退休前持續投入資產中。</p>
+                                        <label className="block text-sm font-medium mb-1 text-slate-300">每年稅後收入</label>
+                                        <p className="text-xs text-slate-400/80 mb-3 font-light">薪資、獎金等實拿金額。儲蓄 = 收入 − 開銷，由系統自動計算。</p>
                                         <div className="relative group">
-                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium group-focus-within:text-brand-400 transition-colors">$</span>
-                                            <input 
-                                                type="text" 
-                                                inputMode="numeric"
-                                                value={annualSavingsStr}
-                                                onChange={handleAnnualSavingsChange}
-                                                className="w-full pl-8 pr-14 py-3.5 glass-input rounded-xl text-lg font-medium text-white transition-all"
-                                            />
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium group-focus-within:text-brand-400 transition-colors">{currency}</span>
+                                            <input type="text" inputMode="numeric" aria-label="每年稅後收入" value={annualIncomeStr} onChange={handleAnnualIncomeChange}
+                                                className="w-full pl-14 pr-14 py-3.5 glass-input rounded-xl text-lg font-medium text-white transition-all" />
                                             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm border-l border-white/10 pl-3">/ 年</span>
                                         </div>
+                                        {annualSavings !== '' && (
+                                            <p className={`text-xs mt-2 font-medium ${annualSavings < 0 ? 'text-rose-400' : 'text-brand-300'}`}>
+                                                每年可儲蓄 {formatCurrencyText(annualSavings)}
+                                                {Number(annualIncome) > 0 && `（儲蓄率 ${((annualSavings / Number(annualIncome)) * 100).toFixed(1)}%）`}
+                                            </p>
+                                        )}
                                     </div>
                                 )}
+
+                                <div>
+                                    <label className="flex items-center gap-2.5 text-sm font-medium text-slate-300 cursor-pointer select-none">
+                                        <input type="checkbox" checked={enablePension}
+                                            onChange={(e) => { setEnablePension(e.target.checked); setKeepGrowingExpense(false); setKeepGrowingNetWorth(false); }}
+                                            className="accent-brand-500 w-4 h-4 cursor-pointer" />
+                                        退休後的固定收入（選填）
+                                    </label>
+                                    <div aria-hidden={!enablePension} className={`grid transition-all duration-300 ease-out ${enablePension ? 'grid-rows-[1fr] opacity-100 translate-y-0 mt-1' : 'grid-rows-[0fr] opacity-0 -translate-y-2 pointer-events-none'}`}>
+                                      <div className="overflow-hidden">
+                                    <p className="text-xs text-slate-400/80 mb-3 mt-1 font-light">勞保年金、勞退月領、租金、兼職等，以今天幣值估算。</p>
+                                    <div className="flex gap-3">
+                                        <div className="relative group flex-1">
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium group-focus-within:text-brand-400 transition-colors">{currency}</span>
+                                            <input type="text" inputMode="numeric" placeholder="0" aria-label="退休後每月固定收入" value={pensionMonthlyStr} onChange={handlePensionChange}
+                                                className="w-full pl-14 pr-14 py-3.5 glass-input rounded-xl text-lg font-medium text-white transition-all" />
+                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm border-l border-white/10 pl-3">/ 月</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <input type="text" inputMode="numeric" aria-label="固定收入起領年齡" value={pensionStartAge}
+                                                onChange={(e) => { const r = e.target.value.replace(/\D/g, ''); setPensionStartAge(r === '' ? '' : Number(r)); }}
+                                                className="w-16 p-2.5 text-right glass-input rounded-xl font-medium text-white focus:outline-none" />
+                                            <span className="text-sm text-slate-400 whitespace-nowrap">歲起領</span>
+                                        </div>
+                                    </div>
+                                      </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -902,9 +952,7 @@
                                         <div className="flex items-center gap-2">
                                             <input 
                                                 type="text"
-                                                inputMode="numeric"
-                                                value={investmentReturn}
-                                                onChange={(e) => setInvestmentReturn(e.target.value.replace(/\D/g, '') === '' ? '' : Number(e.target.value.replace(/\D/g, '')))}
+                                                inputMode="decimal" aria-label="預期投資報酬率" value={investmentReturnStr} onChange={rateChange(setInvestmentReturn, setInvestmentReturnStr)}
                                                 className="w-16 p-1.5 text-right glass-input rounded-lg font-bold text-white focus:outline-none"
                                             />
                                             <span className="text-sm text-slate-400">%/年</span>
@@ -920,9 +968,9 @@
                                                     onChange={(e) => setReturnMode(e.target.value)}
                                                     className="w-full p-2.5 glass-input rounded-xl text-sm font-medium text-white focus:outline-none cursor-pointer"
                                                 >
-                                                    <option value="p25" className="bg-slate-900 text-white">逆風局 P25</option>
-                                                    <option value="p50" className="bg-slate-900 text-white">常態局 P50</option>
-                                                    <option value="p75" className="bg-slate-900 text-white">順風局 P75</option>
+                                                    <option value="p25" className="bg-slate-900 text-white">保守・逆風局 (P25)</option>
+                                                    <option value="p50" className="bg-slate-900 text-white">一般・常態局 (P50)</option>
+                                                    <option value="p75" className="bg-slate-900 text-white">樂觀・順風局 (P75)</option>
                                                 </select>
                                             </div>
 
@@ -943,6 +991,7 @@
                                     {/* 波動度詳細說明框 */}
                                     {enableRandomFloat && (
                                         <div className="mb-4 p-3.5 rounded-xl bg-brand-950/40 border border-brand-500/30 text-xs text-brand-200/90 leading-relaxed backdrop-blur-sm space-y-2 animate-slide-down">
+                                            <p className="text-[11px] text-brand-200/90 leading-normal">模擬採「對數常態＋厚尾」抽樣：年平均預期 {Number(investmentReturn) || 0}%，但因波動拖累，長期複利的中位數約 {geoRet.toFixed(1)}%，並會出現比常態分布更極端的大跌年。</p>
                                             <div className="pt-1 text-[11px] text-brand-300/90 leading-normal">
                                                 {volatilityLevel === 'low' && (
                                                     <>
@@ -976,8 +1025,8 @@
                                         type="range" 
                                         min="-10" max="20" step="0.1"
                                         value={investmentReturn || 0} 
-                                        onChange={(e) => setInvestmentReturn(Number(e.target.value))}
-                                        className="crystal-slider"
+                                        onChange={(e) => { const v = Number(e.target.value); setInvestmentReturn(v); setInvestmentReturnStr(String(v)); }}
+                                        aria-label="預期投資報酬率" className="crystal-slider"
                                     />
                                 </div>
 
@@ -990,9 +1039,7 @@
                                         <div className="flex items-center gap-2">
                                             <input 
                                                 type="text"
-                                                inputMode="numeric"
-                                                value={inflationRate}
-                                                onChange={(e) => setInflationRate(e.target.value.replace(/\D/g, '') === '' ? '' : Number(e.target.value.replace(/\D/g, '')))}
+                                                inputMode="decimal" aria-label="通貨膨脹率" value={inflationRateStr} onChange={rateChange(setInflationRate, setInflationRateStr)}
                                                 className="w-16 p-1.5 text-right glass-input rounded-lg font-bold text-white focus:outline-none"
                                             />
                                             <span className="text-sm text-slate-400">%/年</span>
@@ -1002,8 +1049,8 @@
                                         type="range" 
                                         min="0" max="10" step="0.1"
                                         value={inflationRate || 0} 
-                                        onChange={(e) => setInflationRate(Number(e.target.value))}
-                                        className="crystal-slider"
+                                        onChange={(e) => { const v = Number(e.target.value); setInflationRate(v); setInflationRateStr(String(v)); }}
+                                        aria-label="通貨膨脹率" className="crystal-slider"
                                     />
                                 </div>
 
@@ -1011,11 +1058,22 @@
                                     <p className="text-xs text-slate-400/95 leading-relaxed font-light">
                                         所有預估都以<strong className="text-brand-300 font-medium">今天的幣值</strong>呈現，所以圖表中顯示的數字反映的是你的錢未來<strong className="text-white">實際買得到的東西</strong>。
                                     </p>
+                                    <label className="flex items-center justify-between mt-3 text-xs text-slate-400">
+                                        <span>貨幣符號</span>
+                                        <select aria-label="貨幣符號" value={currency} onChange={(e) => setCurrency(e.target.value)} className="glass-input rounded-lg px-2 py-1 text-white">
+                                            {['NT$', 'US$', '¥', 'HK$', '$'].map(c => <option key={c} value={c} className="bg-slate-900 text-white">{c}</option>)}
+                                        </select>
+                                    </label>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    {errors.length > 0 && (
+                        <div role="alert" className="rounded-2xl border border-rose-500/30 bg-rose-950/30 px-5 py-3 text-sm text-rose-200 space-y-1">
+                            {errors.map((m, i) => <p key={i}>⚠ {m}</p>)}
+                        </div>
+                    )}
                     {/* 整合版面：財務圖表分析中心 */}
                     <div className="glass-panel rounded-3xl p-6 md:p-8 relative overflow-hidden">
                         
@@ -1027,7 +1085,7 @@
                                     <h2 className="text-xl font-bold text-white tracking-wide">財務圖表分析中心</h2>
                                 </div>
                                 <p className="text-sm text-slate-400 font-light">
-                                    {activeTab === 'netWorth' ? '觀察你的淨資產隨時間的成長與破產風險。' : '觀察勞動收入、資本所得與日常開銷的動態平衡與生涯累積。'}
+                                    {activeTab === 'netWorth' ? '觀察你的淨資產隨時間的成長與破產風險。' : '觀察稅後收入（含退休收入）、資本所得與日常開銷的動態平衡與生涯累積。'}
                                 </p>
                             </div>
                             
@@ -1232,7 +1290,7 @@
                                     <div className="flex flex-wrap items-center gap-4 bg-black/20 px-4 py-2 rounded-full border border-white/10">
                                         <div className="flex items-center gap-2">
                                             <span className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.8)]" style={{ backgroundColor: '#34d399' }}></span>
-                                            <span className="text-sm font-medium text-slate-300">{incomeViewType === 'cumulative' ? '累積勞動收入' : '勞動收入'}</span>
+                                            <span className="text-sm font-medium text-slate-300">{incomeViewType === 'cumulative' ? '累積稅後收入' : '稅後收入（含退休收入）'}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <span className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_rgba(96,165,250,0.8)]" style={{ backgroundColor: '#60a5fa' }}></span>
@@ -1313,7 +1371,7 @@
                                                 <Line 
                                                     type="monotone" 
                                                     dataKey={incomeViewType === 'cumulative' ? 'accLabor' : 'laborIncome'} 
-                                                    name={incomeViewType === 'cumulative' ? '累積勞動收入' : '勞動收入'} 
+                                                    name={incomeViewType === 'cumulative' ? '累積稅後收入' : '稅後收入（含退休收入）'} 
                                                     stroke="#34d399" 
                                                     strokeWidth={3} 
                                                     dot={false} 
@@ -1362,7 +1420,7 @@
                                         生涯花費與財富軌跡總覽
                                     </h3>
                                     <p className="text-xs md:text-sm text-slate-300/90 leading-relaxed font-light">
-                                        在您規劃的整體生涯期間，預計總共透過工作賺取 <strong className="text-emerald-400 font-medium">{formatCurrencyText(lifetimeSummary.totalLabor)}</strong> 的勞動收入，透過複利投資滾出 <strong className="text-blue-400 font-medium">{formatCurrencyText(lifetimeSummary.totalCapital)}</strong> 的資本所得，而一生的總日常支出預計為 <strong className="text-rose-400 font-medium">{formatCurrencyText(lifetimeSummary.totalExpense)}</strong>。
+                                        在您規劃的整體生涯期間，預計總共透過工作與退休後固定收入賺取 <strong className="text-emerald-400 font-medium">{formatCurrencyText(lifetimeSummary.totalLabor)}</strong> 的稅後收入（含退休收入），透過複利投資滾出 <strong className="text-blue-400 font-medium">{formatCurrencyText(lifetimeSummary.totalCapital)}</strong> 的資本所得，而一生的總日常支出預計為 <strong className="text-rose-400 font-medium">{formatCurrencyText(lifetimeSummary.totalExpense)}</strong>。
                                     </p>
                                 </div>
                             </div>
@@ -1370,7 +1428,7 @@
                     </div>
 
                     {/* 頁尾免責聲明與版權宣告（彼此等距、緊湊底部） */}
-                    <footer className="text-center text-[11px] text-slate-500/80 space-y-0.5 font-light leading-normal pb-2 md:pb-0">
+                    <footer className="text-center text-[11px] text-slate-400 space-y-0.5 font-light leading-normal pb-2 md:pb-0">
                         <p>免責聲明：本計算器僅供財務規劃與教育參考，所有模擬均基於數學模型與假設數據（如年化報酬、通膨）。不構成具體投資建議。</p>
                         <p>© 2026 Snap Retire by <a href="https://lanzul.com" target="_blank" rel="noopener noreferrer" className="underline text-inherit hover:text-slate-300 transition-colors">lanzul</a>. All rights reserved.</p>
                     </footer>
