@@ -213,6 +213,7 @@
                 </div>
             </div>
             <p class="mt-4">歷史情境可選擇<strong class="text-slate-100">美國股票</strong>（S&amp;P 500 含股息，1928–2025）、<strong class="text-slate-100">全球股票</strong>（MSCI World，1970–2025）、<strong class="text-slate-100">美國公債</strong>（10 年期，1928–2025）與<strong class="text-slate-100">股債 60/40</strong>。選擇後，下方會顯示該市場的資料範圍與歷史實質年化報酬。</p>
+            <p class="mt-3"><strong class="text-slate-100">歷史實質年化報酬</strong>是已扣除通膨後的年化複利報酬，代表<strong class="text-slate-100">實際購買力的真實成長率</strong>。例如實質年化 6%，是指長期下來你的錢能買到的東西，平均每年多 6%，而不是帳面數字成長 6%。</p>
             <p class="mt-3">歷史情境以美元計價，未計匯率與費用，美股歷史也存在倖存者偏差。由於保留了連續下跌的年份，成功率通常會比參數模擬低一些，這是預期中的結果。</p>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-stretch">
@@ -1126,6 +1127,7 @@
                                         <div className="mb-4 p-3.5 rounded-xl bg-brand-950/40 border border-brand-500/30 text-[11px] text-brand-200/90 leading-relaxed backdrop-blur-sm space-y-1.5 animate-slide-down">
                                             <p className="font-semibold">• {HIST_META[histMarket].label}：{HIST_META[histMarket].desc}</p>
                                             <p>• 資料範圍：{st.from}–{st.to} 年（共 {st.n} 年）。歷史實質年化報酬 <strong className="text-white">{st.geo.toFixed(1)}%</strong>（算術平均 {st.ari.toFixed(1)}%），直接採用，不使用上方自訂報酬率。</p>
+                                            <p>• 「實質年化報酬」已扣除通膨，是你的錢<strong className="text-white">實際購買力的真實成長率</strong>，不是帳面名目成長。</p>
                                             <p>• 方法：每次模擬以連續 3 年為一塊，從歷史年度隨機抽樣拼接，保留連續下跌與極端年份；再以你設定的通膨率換算成名目報酬。</p>
                                             <p className="text-slate-400">• 注意：以美元計價、未計匯率與費用；美股歷史存在倖存者偏差，過去績效不代表未來。資料來源：Damodaran（NYU Stern）、MSCI。</p>
                                         </div>); })()}
