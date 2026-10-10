@@ -1579,12 +1579,14 @@
                                     <p className="text-xs md:text-sm text-slate-300/90 leading-relaxed font-light">
                                         在您規劃的整體生涯期間，預計總共透過工作與退休後固定收入賺取 <strong className="text-emerald-400 font-medium">{formatCurrencyText(lifetimeSummary.totalLabor)}</strong> 的稅後收入（含退休收入），透過複利投資滾出 <strong className="text-blue-400 font-medium">{formatCurrencyText(lifetimeSummary.totalCapital)}</strong> 的資本所得，而一生的總日常支出預計為 <strong className="text-rose-400 font-medium">{formatCurrencyText(lifetimeSummary.totalExpense)}</strong>。
                                     </p>
+                                    {enableRandomFloat && (
                                     <p className="text-xs md:text-sm text-slate-300/90 leading-relaxed font-light mt-2">
                                         <strong className="text-amber-300 font-medium">財務自由判定規則：</strong>當淨資產達到<strong className="text-amber-300 font-medium">當年日常開銷的 25 倍</strong>（4% 法則，每年提領 4% 即可支應開銷）時，即視為達成財務自由，並在圖表上標示黃點。判定以當年幣值計算，不受單一年度市場大漲或大跌影響，也未扣除退休後固定收入。
                                         {hitFIAge !== null
                                             ? <>依目前設定，預計於 <strong className="text-amber-300 font-medium">{hitFIAge} 歲</strong>達成財務自由。</>
                                             : <>依目前設定，在預計壽命內尚未達到此門檻。</>}
                                     </p>
+                                    )}
                                 </div>
                             </div>
                         )}
