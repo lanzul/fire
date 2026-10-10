@@ -202,19 +202,27 @@
         <div class="glass-panel rounded-3xl p-6 md:p-8 mb-6 md:mb-8">
             <h2 class="text-lg font-semibold text-white mb-2">擬真浮動：參數模擬與歷史情境</h2>
             <p>「擬真浮動」提供兩種方法，各自回答不同的問題：</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mt-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-3 items-start">
                 <div>
                     <h3 class="text-base font-semibold text-slate-100 mb-1">參數模擬</h3>
                     <p>依你設定的預期報酬率與波動程度，每年隨機抽一個報酬（對數常態加厚尾），適合測試「如果報酬只有這麼多」的假設。</p>
+                    <p class="mt-3"><strong class="text-slate-100">適合的情況：</strong></p>
+                    <ul class="list-disc pl-6 space-y-1 mt-1">
+                        <li>想問自己「如果未來報酬只有 4%，我還撐得住嗎？」，自訂報酬率最直接。</li>
+                        <li>你的配置不在歷史市場清單裡（台股、單一產業、高現金比例），直接輸入自己的報酬與波動度。</li>
+                        <li>想看市場晃得多兇，會怎麼影響成功率：低、中、高三檔波動一鍵比較。</li>
+                    </ul>
+                    <p class="mt-3">小提醒：平均報酬就是你輸入的數字，但波動會拖累複利，長期中位數會略低，設定區的說明框會幫你換算。</p>
+                    <p class="mt-3">每年的報酬各自獨立抽出，年與年互不相干，所以不太會出現 2000–2002 年那種連續多年下跌。想檢驗這種「連環重擊」，請改用歷史情境。</p>
                 </div>
                 <div>
                     <h3 class="text-base font-semibold text-slate-100 mb-1">歷史情境</h3>
                     <p>直接使用真實市場的逐年實質報酬，每次模擬隨機抽連續 3 年為一塊拼成完整路徑，保留連續下跌與極端年份。報酬率由歷史決定，因此不使用自訂報酬率；通膨率則用來把歷史實質報酬換算回名目。</p>
+                    <p class="mt-3">歷史情境可選擇<strong class="text-slate-100">美國股票</strong>（S&amp;P 500 含股息，1928–2025）、<strong class="text-slate-100">全球股票</strong>（MSCI World，1970–2025）、<strong class="text-slate-100">美國公債</strong>（10 年期，1928–2025）與<strong class="text-slate-100">股債 60/40</strong>。選擇後，下方會顯示該市場的資料範圍與歷史實質年化報酬。</p>
+                    <p class="mt-3"><strong class="text-slate-100">歷史實質年化報酬</strong>是已扣除通膨後的年化複利報酬，代表<strong class="text-slate-100">實際購買力的真實成長率</strong>。例如實質年化 6%，是指長期下來你的錢能買到的東西，平均每年多 6%，而不是帳面數字成長 6%。</p>
+                    <p class="mt-3">歷史情境以美元計價，未計匯率與費用，美股歷史也存在倖存者偏差。由於保留了連續下跌的年份，成功率通常會比參數模擬低一些，這是預期中的結果。</p>
                 </div>
             </div>
-            <p class="mt-4">歷史情境可選擇<strong class="text-slate-100">美國股票</strong>（S&amp;P 500 含股息，1928–2025）、<strong class="text-slate-100">全球股票</strong>（MSCI World，1970–2025）、<strong class="text-slate-100">美國公債</strong>（10 年期，1928–2025）與<strong class="text-slate-100">股債 60/40</strong>。選擇後，下方會顯示該市場的資料範圍與歷史實質年化報酬。</p>
-            <p class="mt-3"><strong class="text-slate-100">歷史實質年化報酬</strong>是已扣除通膨後的年化複利報酬，代表<strong class="text-slate-100">實際購買力的真實成長率</strong>。例如實質年化 6%，是指長期下來你的錢能買到的東西，平均每年多 6%，而不是帳面數字成長 6%。</p>
-            <p class="mt-3">歷史情境以美元計價，未計匯率與費用，美股歷史也存在倖存者偏差。由於保留了連續下跌的年份，成功率通常會比參數模擬低一些，這是預期中的結果。</p>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-stretch">
             <div class="glass-panel rounded-3xl p-6 md:p-8">
