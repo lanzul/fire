@@ -1139,7 +1139,7 @@
                                             <p className="font-semibold">• {HIST_META[histMarket].label}：{HIST_META[histMarket].desc}</p>
                                             <p>• 資料範圍：{st.from}–{st.to} 年（共 {st.n} 年）。歷史實質年化報酬 <strong className="text-white">{st.geo.toFixed(1)}%</strong>（算術平均 {st.ari.toFixed(1)}%），直接採用，不使用上方自訂報酬率。</p>
                                             <p>• 「實質年化報酬」已扣除通膨，是你的錢<strong className="text-white">實際購買力的真實成長率</strong>，不是帳面名目成長。</p>
-                                            <p>• 方法：每次模擬以連續 3 年為一塊，從歷史年度隨機抽樣拼接，保留連續下跌與極端年份；再以你設定的通膨率換算成名目報酬。</p>
+                                            <p>• 方法：每次模擬以連續 3 年為一塊，從歷史年度隨機抽樣拼接，保留連續下跌與極端年份；「今天幣值」檢視不受通膨率影響；切換為「未來幣值」時，才會以通膨率換算成名目報酬與金額。</p>
                                             <p className="text-slate-400">• 注意：以美元計價、未計匯率與費用；美股歷史存在倖存者偏差，過去績效不代表未來。資料來源：Damodaran（NYU Stern）、MSCI。</p>
                                         </div>); })()}
                                     {enableRandomFloat && !histMode && (
@@ -1185,6 +1185,7 @@
                                     )}
                                 </div>
 
+                                {!(histMode && currencyType === 'today') && (
                                 <div>
                                     <div className="flex justify-between items-center mb-5">
                                         <label className="text-sm font-medium text-slate-300 flex items-center gap-1.5">
@@ -1208,6 +1209,7 @@
                                         aria-label="通貨膨脹率" className="crystal-slider"
                                     />
                                 </div>
+                                )}
 
                                 <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm shadow-inner">
                                     <p className="text-xs text-slate-400/95 leading-relaxed font-light">
