@@ -254,7 +254,7 @@
 
     <script type="text/babel" data-type="module">
         const { useState, useEffect, useMemo, useCallback, useRef, useDeferredValue } = React;
-        const { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } = window.Recharts; 
+        const { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot, ReferenceLine } = window.Recharts; 
 
         // 破產紅點元件
         const CustomReferenceDot = (props) => {
@@ -1560,6 +1560,22 @@
                                                         x={hitFIAge} 
                                                         y={chartData.find(d => d.age === hitFIAge).capitalIncome} 
                                                         shape={<CustomFIReferenceDot hitFIAge={hitFIAge} />}
+                                                    />
+                                                )}
+
+                                                {incomeViewType === 'cumulative' && hitFIAge !== null && chartData.find(d => d.age === hitFIAge) && (
+                                                    <ReferenceLine
+                                                        x={hitFIAge}
+                                                        stroke="#fbbf24"
+                                                        strokeWidth={1.5}
+                                                        strokeDasharray="6 5"
+                                                        label={{
+                                                            value: `財務自由 (${hitFIAge} 歲)`,
+                                                            position: hitFIAge > (chartData[0].age + chartData[chartData.length - 1].age) / 2 ? 'insideTopLeft' : 'insideTopRight',
+                                                            fill: '#fbbf24',
+                                                            fontSize: 13,
+                                                            fontWeight: 'bold'
+                                                        }}
                                                     />
                                                 )}
                                             </LineChart>
