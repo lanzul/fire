@@ -624,7 +624,8 @@
                         const effectiveRet = histMode ? ((1 + histPath[yearIdx] / 100) * (1 + infRate / 100) - 1) * 100 : drawReturn(prng, baseRet, sigma);
                         returns.push(effectiveRet);
 
-                        if (tempWorth <= 0) {
+                        // 起始年齡的期初資產是「起點」，不算歸零（否則起始淨資產為 0 時成功率恆為 0）
+                        if (age > startAge && tempWorth <= 0) {
                             if (localHitZero === null) localHitZero = age;
                         }
 
