@@ -200,11 +200,11 @@
             <p>Snap Retire 是一款免費的視覺化退休試算工具。輸入目前年齡、預計退休年齡、淨資產、每月開銷與每年儲蓄，並設定預期報酬率、市場波動度與通膨率，就能用 <strong class="text-slate-100">1000 次蒙地卡羅模擬</strong>看到你的退休資金「撐到預計壽命的機率」。</p>
         </div>
         <div class="glass-panel rounded-3xl p-6 md:p-8 mb-6 md:mb-8">
-            <h2 class="text-lg font-semibold text-white mb-2">擬真浮動：參數模擬與歷史情境</h2>
-            <p>「擬真浮動」提供兩種方法，各自回答不同的問題：</p>
+            <h2 class="text-lg font-semibold text-white mb-2">擬真浮動與歷史情境</h2>
+            <p>除了固定報酬，還有兩種會隨市場起伏的模式，各自回答不同的問題：</p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-3 items-start">
                 <div>
-                    <h3 class="text-base font-semibold text-slate-100 mb-1">參數模擬</h3>
+                    <h3 class="text-base font-semibold text-slate-100 mb-1">擬真浮動</h3>
                     <p>依你設定的預期報酬率與波動程度，每年隨機抽一個報酬（對數常態加厚尾），適合測試「如果報酬只有這麼多」的假設。</p>
                     <p class="mt-3"><strong class="text-slate-100">適合的情況：</strong></p>
                     <ul class="list-disc pl-6 space-y-1 mt-1">
@@ -220,7 +220,7 @@
                     <p>直接使用真實市場的逐年實質報酬，每次模擬隨機抽連續 3 年為一塊拼成完整路徑，保留連續下跌與極端年份。報酬率由歷史決定，因此不使用自訂報酬率；通膨率則用來把歷史實質報酬換算回名目。</p>
                     <p class="mt-3">歷史情境可選擇<strong class="text-slate-100">美國股票</strong>（S&amp;P 500 含股息，1928–2025）、<strong class="text-slate-100">全球股票</strong>（MSCI World，1970–2025）、<strong class="text-slate-100">美國公債</strong>（10 年期，1928–2025）、<strong class="text-slate-100">股債 60/40</strong>與<strong class="text-slate-100">台灣 0050 ETF</strong>（含息還原報酬，2004–2025）。選擇後，下方會顯示該市場的資料範圍與歷史實質年化報酬。</p>
                     <p class="mt-3"><strong class="text-slate-100">歷史實質年化報酬</strong>是已扣除通膨後的年化複利報酬，代表<strong class="text-slate-100">實際購買力的真實成長率</strong>。例如實質年化 6%，是指長期下來你的錢能買到的東西，平均每年多 6%，而不是帳面數字成長 6%。</p>
-                    <p class="mt-3">美國與全球市場以美元計價、未計匯率與費用，美股歷史也存在倖存者偏差；0050 以新台幣計價並以台灣 CPI 折算，但只有 22 年資料、涵蓋半導體高成長期，歷史報酬可能偏高。由於保留了連續下跌的年份，成功率通常會比參數模擬低一些，這是預期中的結果。</p>
+                    <p class="mt-3">美國與全球市場以美元計價、未計匯率與費用，美股歷史也存在倖存者偏差；0050 以新台幣計價並以台灣 CPI 折算，但只有 22 年資料、涵蓋半導體高成長期，歷史報酬可能偏高。由於保留了連續下跌的年份，成功率通常會比擬真浮動低一些，這是預期中的結果。</p>
                 </div>
             </div>
         </div>
@@ -1041,70 +1041,58 @@
 
                         {/* 第三欄：進階假設 */}
                         <div className="flex-1 relative z-10">
-                            <div className="flex items-center gap-3 mb-8">
+                            <div className="flex items-center gap-3 mb-8 relative">
                                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-brand-500/30 border border-white/20">3</div>
                                 <h2 className="text-xl font-semibold text-white tracking-wide">預計投資報酬率</h2>
+                                <span 
+                                                className="w-6 h-6 rounded-md bg-white/5 border border-white/10 text-slate-400 hover:text-slate-200 hover:bg-white/10 flex items-center justify-center text-xs cursor-help transition-colors group/tooltip font-serif italic" 
+                                            >
+                                                i
+                                                <div className="absolute top-full left-0 right-0 mt-2 w-auto p-3.5 bg-slate-800/95 border border-slate-600 rounded-xl text-[11px] text-slate-200 leading-relaxed shadow-2xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 whitespace-normal backdrop-blur-md">
+                                                    <p className="mb-2"><strong>蒙地卡羅擬真流動率：</strong>「真金白銀」投入市場持續數十年，不是穩賺不賠，而是會經歷真實世界的經濟週期：有時遇到全球股災（暴跌 20%-30%），有時又迎來大爆發的超級多頭（暴賺 30%-40%）。因為未來的經濟順序沒人說得準，我們直接用電腦模擬 1,000 種不同的市場劇情線，並以三種狀態排列模擬。</p>
+                                                    <p className="text-brand-300"><strong>實務建議：</strong>在做長期退休財務規劃時，蒙地卡羅 P50 的結果更具真實參考價值，因為它去除了少數極端大漲路徑拉高平均值的偏差，呈現的是一般投資人在承受市場波動時，最機率中庸且客觀的資產累積軌跡。</p>
+                                                    
+                                                </div>
+                                            </span>
                             </div>
 
                             <div className="space-y-8">
                                 <div>
-                                    <div className="flex justify-between items-center mb-3">
+                                    <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-2 mb-3">
                                         <div className="flex items-center gap-2">
-                                            {/* 參考圖片風格：固定報酬與擬真浮動 切換按鈕 */}
-                                            <div className="flex bg-black/40 p-1 rounded-lg border border-white/10 shadow-inner">
-                                                <button 
-                                                    className={`px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-all duration-300 ${!enableRandomFloat ? 'bg-gradient-to-r from-brand-500 to-brand-600 shadow-[0_0_10px_rgba(139,92,246,0.4)] border border-white/20 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
-                                                    onClick={() => setEnableRandomFloat(false)}
-                                                >
-                                                    固定報酬
-                                                </button>
-                                                <button 
-                                                    className={`px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-all duration-300 ${enableRandomFloat ? 'bg-gradient-to-r from-brand-500 to-brand-600 shadow-[0_0_10px_rgba(139,92,246,0.4)] border border-white/20 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
-                                                    onClick={() => {
-                                                        if (!enableRandomFloat) {
-                                                            setEnableRandomFloat(true);
-                                                            setRandomSeed(Date.now()); // 重換種子跑新亂數
-                                                            setKeepGrowingExpense(false);
-                                                            setKeepGrowingNetWorth(false);
-                                                        }
-                                                    }}
-                                                >
-                                                    擬真浮動
-                                                </button>
+                                            {/* 三段式切換：固定報酬 / 擬真浮動（參數模擬）/ 歷史情境 */}
+                                            <div role="group" aria-label="報酬模式" className="flex bg-black/40 p-1 rounded-lg border border-white/10 shadow-inner">
+                                                {[['fixed', '固定報酬'], ['param', '擬真浮動'], ['hist', '歷史情境']].map(([k, lbl]) => {
+                                                    const cur = !enableRandomFloat ? 'fixed' : (randomMethod === 'hist' ? 'hist' : 'param');
+                                                    return (
+                                                        <button key={k} aria-pressed={cur === k}
+                                                            className={`px-2.5 py-1.5 text-xs sm:text-[13px] font-medium rounded-md transition-all duration-300 whitespace-nowrap ${cur === k ? 'bg-gradient-to-r from-brand-500 to-brand-600 shadow-[0_0_10px_rgba(139,92,246,0.4)] border border-white/20 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
+                                                            onClick={() => {
+                                                                if (cur === k) return;
+                                                                if (k === 'fixed') { setEnableRandomFloat(false); return; }
+                                                                setRandomMethod(k);
+                                                                setEnableRandomFloat(true);
+                                                                setRandomSeed(Date.now()); // 重換種子跑新亂數
+                                                                setKeepGrowingExpense(false);
+                                                                setKeepGrowingNetWorth(false);
+                                                            }}
+                                                        >{lbl}</button>
+                                                    );
+                                                })}
                                             </div>
-                                            <span 
-                                                className="w-6 h-6 rounded-md bg-white/5 border border-white/10 text-slate-400 hover:text-slate-200 hover:bg-white/10 flex items-center justify-center text-xs cursor-help transition-colors relative group/tooltip font-serif italic" 
-                                            >
-                                                i
-                                                <div className="absolute top-full left-0 sm:left-auto sm:right-[-8px] mt-2 w-72 sm:w-80 max-w-[85vw] p-3.5 bg-slate-800/95 border border-slate-600 rounded-xl text-[11px] text-slate-200 leading-relaxed shadow-2xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 whitespace-normal backdrop-blur-md">
-                                                    <p className="mb-2"><strong>蒙地卡羅擬真流動率：</strong>「真金白銀」投入市場持續數十年，不是穩賺不賠，而是會經歷真實世界的經濟週期：有時遇到全球股災（暴跌 20%-30%），有時又迎來大爆發的超級多頭（暴賺 30%-40%）。因為未來的經濟順序沒人說得準，我們直接用電腦模擬 1,000 種不同的市場劇情線，並以三種狀態排列模擬。</p>
-                                                    <p className="text-brand-300"><strong>實務建議：</strong>在做長期退休財務規劃時，蒙地卡羅 P50 的結果更具真實參考價值，因為它去除了少數極端大漲路徑拉高平均值的偏差，呈現的是一般投資人在承受市場波動時，最機率中庸且客觀的資產累積軌跡。</p>
-                                                    {/* Tooltip 頂部小箭頭 */}
-                                                    <div className="absolute bottom-full left-4 sm:left-auto sm:right-2.5 border-4 border-transparent border-b-slate-800"></div>
-                                                </div>
-                                            </span>
                                         </div>
                                         {!histMode && (
                                         <div className="flex items-center gap-2">
                                             <input 
                                                 type="text"
                                                 inputMode="decimal" aria-label="預期投資報酬率" value={investmentReturnStr} onChange={rateChange(setInvestmentReturn, setInvestmentReturnStr)}
-                                                className="w-16 p-1.5 text-right glass-input rounded-lg font-bold text-white focus:outline-none"
+                                                className="w-14 p-1.5 text-right glass-input rounded-lg font-bold text-white focus:outline-none"
                                             />
-                                            <span className="text-sm text-slate-400">%/年</span>
+                                            <span className="text-xs text-slate-400 whitespace-nowrap">%/年</span>
                                         </div>
                                         )}
                                     </div>
                                     
-                                    {enableRandomFloat && (
-                                        <div role="group" aria-label="擬真浮動方法" className="mb-3 flex w-fit bg-black/40 p-0.5 rounded-lg border border-white/10 animate-slide-down">
-                                            {[['param', '參數模擬'], ['hist', '歷史情境']].map(([k, lbl]) => (
-                                                <button key={k} onClick={() => { setRandomMethod(k); setRandomSeed(Date.now()); }}
-                                                    className={`px-3 py-1 text-xs font-medium rounded-md transition-all duration-300 ${randomMethod === k ? 'bg-white/15 text-white' : 'text-slate-400 hover:text-slate-200'}`}>{lbl}</button>
-                                            ))}
-                                        </div>
-                                    )}
-
                                     {/* 投資報酬率模式與波動度選單 */}
                                     {enableRandomFloat && (
                                         <div className="mb-4 flex gap-2 animate-slide-down">
